@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Body Metrics — Workout Tracker</title>
+  <style>
+    :root {
+      --bg: #0d0d14; --surface: #13131e; --surface2: #1b1b2e; --border: #24243c;
+      --accent: #7c3aed; --accent-h: #6d28d9; --green: #10b981;
+      --text: #e2e8f0; --dim: #94a3b8; --muted: #4a5570;
+      --yellow: #f59e0b; --blue: #3b82f6; --pink: #ec4899; --r: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; min-height: 100vh; font-size: 14px; line-height: 1.5; }
+    #app { max-width: 1080px; margin: 0 auto; padding: 0 16px 80px; }
+
+    /* ── Page nav ── */
+    .page-nav { display: flex; align-items: center; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .pnav-a { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; transition: all .15s; }
+    .pnav-a:hover { background: var(--surface2); color: var(--text); }
+    .pnav-a.cur { background: var(--surface2); color: var(--accent); }
+    .pnav-sep { color: var(--border); font-size: 16px; }
+
+    /* ── Header ── */
+    .hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .hdr-title { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-ghost { background: transparent; color: var(--dim); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .close-btn { background: none; border: none; cursor: pointer; font-size: 24px; color: var(--muted); line-height: 1; padding: 0 2px; transition: color .15s; }
+    .close-btn:hover { color: var(--text); }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 6px; color: var(--muted); transition: all .15s; }
+    .icon-btn:hover { background: var(--surface2); color: var(--red, #ef4444); }
+
+    /* ── Sec title ── */
+    .sec-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 14px; margin-top: 28px; }
+    .sec-title:first-child { margin-top: 0; }
+
+    /* ── Stats row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 28px; }
+    @media (max-width: 720px) { .stats-row { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 460px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
+    .stat-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-val.empty { color: var(--muted); font-size: 16px; font-style: italic; font-weight: 400; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .stat-delta { font-size: 11px; margin-top: 3px; font-weight: 600; }
+    .delta-down { color: var(--green); }
+    .delta-up   { color: var(--yellow); }
+
+    /* ── Charts grid ── */
+    .charts-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 28px; }
+    @media (max-width: 680px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; }
+    .chart-hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .chart-title { font-size: 13px; font-weight: 700; color: #fff; }
+    .chart-unit { font-size: 11px; color: var(--muted); }
+    .no-data { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 13px; font-style: italic; }
+
+    /* ── Log table ── */
+    .hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--surface2); padding: 8px 14px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    .hl { color: #fff; font-weight: 600; }
+    .empty-table { padding: 40px 24px; text-align: center; color: var(--muted); }
+    .empty-table p:last-child { font-size: 12px; margin-top: 6px; opacity: .6; }
+
+    /* ── Modal ── */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); width: 100%; max-width: 440px; padding: 24px; display: flex; flex-direction: column; gap: 14px; max-height: 90vh; overflow-y: auto; }
+    .modal-hdr { display: flex; justify-content: space-between; align-items: center; }
+    .modal-hdr h3 { font-size: 17px; font-weight: 700; color: #fff; }
+    .modal-ftr { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Form ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; }
+    .field input, .field textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; color: var(--text); font-size: 14px; width: 100%; transition: border-color .15s; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+    .field-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE  (shared with all pages via localStorage)
+// ═══════════════════════════════════════════════
+
+const STORAGE_KEY = "wt-v1";
+const DEFAULT_STATE = {
+  settings: { programStartDate: null, trainingMaxes: {} },
+  liftLogs: [], runLogs: [],
+  bodyLogs: [], // { id, date, weight, bodyFat, leanMass, rhr, hrv, notes }
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const p=JSON.parse(raw); return {...DEFAULT_STATE,...p,settings:{...DEFAULT_STATE.settings,...p.settings}}; }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+let S = loadState();
+if (!S.bodyLogs) S.bodyLogs = [];
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+
+function pad(n)          { return String(n).padStart(2,"0"); }
+function todayStr()      { return new Date().toISOString().split("T")[0]; }
+function uid()           { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function fmtDate(d)      { return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function fmtDateShort(d) { return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function fmt1dp(v)       { return v!=null&&v!==""?Math.round(v*10)/10:"—"; }
+
+// ═══════════════════════════════════════════════
+//  CHART HELPERS
+// ═══════════════════════════════════════════════
+
+function svgLine(data, { color="#7c3aed", height=120, fmtY=null }={}) {
+  if (!data||data.length<2) return `<div class="no-data">Log at least 2 entries to see the trend</div>`;
+  const vals=data.map(d=>d.y);
+  const mn=Math.min(...vals), mx=Math.max(...vals), rng=mx-mn||1;
+  const PL=46,PR=10,PT=10,PB=26, vW=600, vH=height, W=vW-PL-PR, H=vH-PT-PB;
+  const tx=i=>PL+(i/(data.length-1))*W;
+  const ty=v=>PT+H-((v-mn)/rng)*H;
+  const pts=data.map((d,i)=>`${tx(i)},${ty(d.y)}`).join(" ");
+  const gridVs=[mn,(mn+mx)/2,mx];
+  const grid=gridVs.map(v=>{
+    const y=ty(v), lbl=fmtY?fmtY(v):Math.round(v*10)/10;
+    return `<line x1="${PL}" y1="${y}" x2="${PL+W}" y2="${y}" stroke="var(--border)" stroke-width="1"/>
+            <text x="${PL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="system-ui">${lbl}</text>`;
+  }).join("");
+  const step=Math.max(1,Math.ceil(data.length/6));
+  const xLbls=data.map((d,i)=>i%step===0?`<text x="${tx(i)}" y="${vH-2}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="system-ui">${d.label||""}</text>`:"").join("");
+  const dots=data.map((d,i)=>`<circle cx="${tx(i)}" cy="${ty(d.y)}" r="3" fill="${color}" opacity=".9"/>`).join("");
+  const lastX=tx(data.length-1);
+  const area=`<polygon points="${PL},${ty(mn)} ${pts} ${lastX},${ty(mn)}" fill="${color}" opacity=".07"/>`;
+  return `<svg viewBox="0 0 ${vW} ${vH}" style="width:100%;height:${vH}px;display:block">
+    ${grid}${area}
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+    ${dots}${xLbls}
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════
+//  DATA HELPERS
+// ═══════════════════════════════════════════════
+
+function sortedLogs() {
+  return [...S.bodyLogs].sort((a,b)=>b.date.localeCompare(a.date));
+}
+
+function latest(field) {
+  const log = sortedLogs().find(l => l[field] != null && l[field] !== "");
+  return log ? log[field] : null;
+}
+
+function chartData(field, n=20) {
+  return sortedLogs()
+    .filter(l=>l[field]!=null&&l[field]!=="")
+    .slice(0,n)
+    .reverse()
+    .map(l=>({ label:fmtDateShort(l.date), y:parseFloat(l[field]) }));
+}
+
+function delta(field, n=7) {
+  // Change over last n days vs previous entry
+  const logs = sortedLogs().filter(l=>l[field]!=null&&l[field]!=="");
+  if (logs.length < 2) return null;
+  return parseFloat(logs[0][field]) - parseFloat(logs[1][field]);
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+
+function render() { document.getElementById("app").innerHTML = appHtml(); }
+
+function appHtml() {
+  const logs = sortedLogs();
+
+  // Stats
+  const wt     = latest("weight");
+  const bf     = latest("bodyFat");
+  const lean   = wt&&bf ? Math.round((wt*(1-bf/100))*10)/10 : null;
+  const rhr    = latest("rhr");
+  const hrv    = latest("hrv");
+
+  const wtDelta  = delta("weight");
+  const bfDelta  = delta("bodyFat");
+  const rhrDelta = delta("rhr");
+  const hrvDelta = delta("hrv");
+
+  function statCard(lbl, val, unit, d, lowerBetter=false) {
+    const hasVal = val!=null;
+    const dHtml = d!=null ? (() => {
+      const better = lowerBetter ? d<0 : d>0;
+      const cls = better ? "delta-down" : "delta-up";
+      const sign = d>0?"+":"";
+      return `<div class="stat-delta ${cls}">${sign}${Math.round(d*10)/10} ${unit}</div>`;
+    })() : "";
+    return `<div class="stat-card">
+      <div class="stat-lbl">${lbl}</div>
+      <div class="stat-val${!hasVal?" empty":""}">${hasVal?val+"<span style='font-size:12px;color:var(--muted);font-weight:400'> "+unit+"</span>":"—"}</div>
+      ${dHtml}
+    </div>`;
+  }
+
+  const statsHtml=`<div class="stats-row">
+    ${statCard("Body Weight", wt!=null?fmt1dp(wt):null, "lbs", wtDelta, true)}
+    ${statCard("Body Fat", bf!=null?fmt1dp(bf):null, "%", bfDelta, true)}
+    ${statCard("Lean Mass", lean!=null?lean:null, "lbs", null, false)}
+    ${statCard("Resting HR", rhr!=null?Math.round(rhr):null, "bpm", rhrDelta, true)}
+    ${statCard("HRV", hrv!=null?Math.round(hrv):null, "ms", hrvDelta, false)}
+  </div>`;
+
+  // Charts (4 in 2×2)
+  const chartsHtml=`<div class="charts-grid">
+    <div class="chart-section" style="border-top:3px solid var(--accent)">
+      <div class="chart-hdr"><div class="chart-title">Body Weight</div><div class="chart-unit">lbs</div></div>
+      ${svgLine(chartData("weight"),{color:"var(--accent)",height:120})}
+    </div>
+    <div class="chart-section" style="border-top:3px solid var(--yellow)">
+      <div class="chart-hdr"><div class="chart-title">Body Fat %</div><div class="chart-unit">%</div></div>
+      ${svgLine(chartData("bodyFat"),{color:"var(--yellow)",height:120})}
+    </div>
+    <div class="chart-section" style="border-top:3px solid var(--pink)">
+      <div class="chart-hdr"><div class="chart-title">Resting Heart Rate</div><div class="chart-unit">bpm</div></div>
+      ${svgLine(chartData("rhr"),{color:"var(--pink)",height:120})}
+    </div>
+    <div class="chart-section" style="border-top:3px solid var(--blue)">
+      <div class="chart-hdr"><div class="chart-title">HRV</div><div class="chart-unit">ms</div></div>
+      ${svgLine(chartData("hrv"),{color:"var(--blue)",height:120})}
+    </div>
+  </div>`;
+
+  // Log table
+  const tableHtml=logs.length ? `
+  <div class="hist-card">
+    <table>
+      <thead><tr><th>Date</th><th>Weight</th><th>BF%</th><th>Lean</th><th>RHR</th><th>HRV</th><th>Notes</th><th></th></tr></thead>
+      <tbody>
+        ${logs.map(l=>{
+          const leanMass = l.weight&&l.bodyFat ? Math.round(l.weight*(1-l.bodyFat/100)*10)/10 : "—";
+          return `<tr>
+            <td>${fmtDate(l.date)}</td>
+            <td class="hl">${l.weight!=null&&l.weight!==""?l.weight+" lbs":"—"}</td>
+            <td>${l.bodyFat!=null&&l.bodyFat!==""?l.bodyFat+"%":"—"}</td>
+            <td>${typeof leanMass==="number"?leanMass+" lbs":"—"}</td>
+            <td>${l.rhr!=null&&l.rhr!==""?l.rhr+" bpm":"—"}</td>
+            <td>${l.hrv!=null&&l.hrv!==""?l.hrv+" ms":"—"}</td>
+            <td style="color:var(--dim);font-size:12px">${l.notes||""}</td>
+            <td><button class="icon-btn" onclick="deleteLog('${l.id}')" title="Delete">🗑</button></td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  </div>` : `
+  <div class="hist-card"><div class="empty-table">
+    <p>No entries yet</p>
+    <p>Tap "Log Today" to record your first body metrics</p>
+  </div></div>`;
+
+  return `
+  <nav class="page-nav">
+    <a href="index.html" class="pnav-a">🏠 Today</a>
+    <span class="pnav-sep">/</span>
+    <a href="progress.html" class="pnav-a">📈 Progress</a>
+    <span class="pnav-sep">/</span>
+    <a href="metrics.html" class="pnav-a cur">⚖️ Metrics</a>
+  </nav>
+  <div class="hdr">
+    <div class="hdr-title">Body Metrics</div>
+    <button class="btn btn-primary" onclick="openLog()">+ Log Today</button>
+  </div>
+
+  <div class="sec-title">Latest</div>
+  ${statsHtml}
+
+  <div class="sec-title">Trends</div>
+  ${chartsHtml}
+
+  <div class="sec-title">Log History</div>
+  ${tableHtml}
+
+  <!-- Log modal -->
+  <div class="overlay" id="ov-log">
+    <div class="modal">
+      <div class="modal-hdr">
+        <h3>Log Body Metrics</h3>
+        <button class="close-btn" onclick="closeLog()">×</button>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="m-date" value="${todayStr()}">
+      </div>
+      <div class="modal-grid">
+        <div class="field">
+          <label>Body Weight (lbs)</label>
+          <input type="number" id="m-wt" step="0.1" placeholder="175.0">
+        </div>
+        <div class="field">
+          <label>Body Fat %</label>
+          <input type="number" id="m-bf" step="0.1" placeholder="18.0">
+          <div class="field-hint">From DEXA, calipers, or scale</div>
+        </div>
+        <div class="field">
+          <label>Resting HR (bpm)</label>
+          <input type="number" id="m-rhr" placeholder="55">
+          <div class="field-hint">Morning, before getting up</div>
+        </div>
+        <div class="field">
+          <label>HRV (ms)</label>
+          <input type="number" id="m-hrv" placeholder="65">
+          <div class="field-hint">From Whoop, Oura, Garmin, etc.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes (optional)</label>
+        <input type="text" id="m-notes" placeholder="e.g. post-refeed, poor sleep…">
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-ghost" onclick="closeLog()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLog()">Save</button>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+
+function openLog() {
+  document.getElementById("m-date").value  = todayStr();
+  document.getElementById("m-wt").value    = "";
+  document.getElementById("m-bf").value    = "";
+  document.getElementById("m-rhr").value   = "";
+  document.getElementById("m-hrv").value   = "";
+  document.getElementById("m-notes").value = "";
+  document.getElementById("ov-log").classList.add("open");
+}
+
+function closeLog() { document.getElementById("ov-log").classList.remove("open"); }
+
+function saveLog() {
+  const date  = document.getElementById("m-date").value;
+  const wt    = document.getElementById("m-wt").value.trim();
+  const bf    = document.getElementById("m-bf").value.trim();
+  const rhr   = document.getElementById("m-rhr").value.trim();
+  const hrv   = document.getElementById("m-hrv").value.trim();
+  const notes = document.getElementById("m-notes").value.trim();
+
+  if (!date) return;
+  if (!wt && !bf && !rhr && !hrv) return; // need at least one value
+
+  // Remove existing entry for same date, replace
+  S.bodyLogs = S.bodyLogs.filter(l => l.date !== date);
+  S.bodyLogs.push({
+    id:     uid(),
+    date,
+    weight: wt   !== "" ? parseFloat(wt)   : null,
+    bodyFat: bf  !== "" ? parseFloat(bf)   : null,
+    rhr:    rhr  !== "" ? parseFloat(rhr)  : null,
+    hrv:    hrv  !== "" ? parseFloat(hrv)  : null,
+    notes,
+  });
+
+  saveState();
+  closeLog();
+  render();
+}
+
+function deleteLog(id) {
+  S.bodyLogs = S.bodyLogs.filter(l => l.id !== id);
+  saveState();
+  render();
+}
+
+document.addEventListener("click", e => {
+  if (e.target.classList.contains("overlay")) e.target.classList.remove("open");
+});
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>

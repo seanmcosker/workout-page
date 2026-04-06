@@ -34,6 +34,14 @@
 
     /* ── Header ── */
     /* ── Sticky nav ── */
+    /* ── Page nav (cross-page links) ── */
+    .page-nav { display: flex; align-items: center; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+    .pnav-a { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; transition: all .15s; }
+    .pnav-a:hover { background: var(--surface2); color: var(--text); }
+    .pnav-a.cur { background: var(--surface2); color: var(--accent); }
+    .pnav-sep { color: var(--border); font-size: 16px; }
+
+    /* ── Sticky section nav (within-page) ── */
     .sticky-nav { position: sticky; top: 0; z-index: 50; background: rgba(13,13,20,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 16px; margin: 0 -16px 24px; }
     .snav-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all .15s; margin-bottom: -1px; }
     .snav-btn:hover { color: var(--text); }
@@ -151,9 +159,18 @@
     .empty-hist { padding: 48px 24px; text-align: center; color: var(--muted); }
     .empty-hist p:last-child { font-size: 12px; margin-top: 6px; opacity: .6; }
     .type-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .type-Easy-Run     { background: rgba(16,185,129,.12); color: #34d399; }
+    .type-Long-Run     { background: rgba(124,58,237,.12); color: #a78bfa; }
+    .type-Threshold    { background: rgba(245,158,11,.12);  color: #fbbf24; }
+    .type-5K-Time-Trial{ background: rgba(239,68,68,.12);   color: #f87171; }
+    /* legacy */
     .type-Zone-2 { background: rgba(16,185,129,.12); color: #34d399; }
     .type-Speed  { background: rgba(245,158,11,.12); color: #fbbf24; }
     .type-Tempo  { background: rgba(124,58,237,.12); color: #a78bfa; }
+    /* history action buttons */
+    .hist-actions { white-space: nowrap; text-align: right; }
+    .hist-act-btn { background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: 5px; color: var(--muted); font-size: 13px; line-height: 1; transition: all .15s; }
+    .hist-act-btn:hover { background: var(--surface2); color: var(--text); }
 
     /* ── Modal ── */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
@@ -181,6 +198,24 @@
     .prog-note-banner { background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--dim); line-height: 1.6; }
     .prog-note-banner strong { color: var(--accent); }
 
+    /* ── Unified log modal ── */
+    .lg-mode-toggle { display: flex; gap: 6px; }
+    .lg-mode-btn { flex: 1; padding: 9px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; text-align: center; }
+    .lg-mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .lg-week-hint { background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.2); border-radius: 7px; padding: 7px 12px; font-size: 12px; color: #c4b5fd; font-weight: 600; margin-bottom: 2px; }
+    .lg-set-row { display: grid; grid-template-columns: auto 80px 14px 72px 28px; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .lg-set-row:last-child { border-bottom: none; }
+    .lg-set-lbl { font-size: 12px; color: var(--dim); }
+    .lg-set-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 7px; color: var(--text); font-size: 14px; text-align: center; width: 100%; }
+    .lg-set-input:focus { outline: none; border-color: var(--accent); }
+    .lg-x { text-align: center; color: var(--muted); font-size: 13px; }
+    .lg-del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 16px; padding: 2px 4px; border-radius: 4px; line-height: 1; transition: all .15s; }
+    .lg-del-btn:hover { background: rgba(239,68,68,.15); color: #ef4444; }
+    .lg-add-btn { width: 100%; margin-top: 8px; padding: 7px; background: none; border: 1px dashed var(--border); border-radius: 7px; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .lg-add-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,58,237,.06); }
+    .btn-log { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .btn-log:hover { background: var(--accent-h); }
+
     /* ── Calendar ── */
     .cal-sec { margin-top: 32px; }
     .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -200,8 +235,9 @@
     .cal-scheme { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); opacity: .7; }
     .cal-tag { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
     .cal-tag-lift  { background: rgba(124,58,237,.18); color: #c4b5fd; }
-    .cal-tag-z2    { background: rgba(16,185,129,.18);  color: #6ee7b7; }
-    .cal-tag-speed { background: rgba(245,158,11,.18);  color: #fcd34d; }
+    .cal-tag-easy  { background: rgba(16,185,129,.18);  color: #6ee7b7; }
+    .cal-tag-long  { background: rgba(124,58,237,.18);  color: #c4b5fd; }
+    .cal-tag-thresh{ background: rgba(245,158,11,.18);  color: #fcd34d; }
     .cal-logged { position: absolute; top: 5px; right: 5px; font-size: 10px; color: var(--green); font-weight: 800; }
     .cal-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
     .cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
@@ -222,6 +258,73 @@
     .day-run-type { font-size: 22px; font-weight: 800; color: var(--green); }
     .day-run-target { font-size: 13px; color: var(--dim); margin-top: 2px; }
     .day-rest { color: var(--muted); font-size: 13px; font-style: italic; }
+
+    /* ── Progress view ── */
+    .tab-strip { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .t-btn { background: none; border: none; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+    .t-btn:hover { color: var(--dim); }
+    .t-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 620px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
+    .stat-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .stb { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: var(--r); padding: 20px; margin-bottom: 28px; }
+    .stb-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .stb-day { font-size: 13px; font-weight: 700; color: var(--dim); }
+    .stb-scheme-badge { font-size: 11px; font-weight: 600; color: var(--accent); background: rgba(124,58,237,.12); padding: 2px 10px; border-radius: 12px; }
+    .stb-lift { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -1px; margin-bottom: 16px; }
+    .stb-body { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 580px) { .stb-body { grid-template-columns: 1fr; } }
+    .stb-sets-lbl, .stb-beat-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 8px; }
+    .stb-set { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 7px; font-size: 14px; margin-bottom: 4px; background: var(--surface2); }
+    .stb-set.top { background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.2); }
+    .stb-set-w { font-weight: 700; color: #fff; min-width: 60px; }
+    .stb-set-r { color: var(--dim); flex: 1; }
+    .stb-set-pct { font-size: 11px; color: var(--muted); }
+    .stb-beat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+    .stb-beat-box.empty { opacity: .5; }
+    .stb-beat-val { font-size: 22px; font-weight: 800; color: #fff; margin: 4px 0; }
+    .stb-beat-e1rm { font-size: 12px; color: var(--muted); }
+    .stb-beat-date { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .pr-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+    @media (max-width: 620px) { .pr-grid { grid-template-columns: 1fr; } }
+    .pr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .pr-card-hdr { display: flex; justify-content: space-between; align-items: baseline; }
+    .pr-lift { font-size: 16px; font-weight: 800; color: #fff; }
+    .pr-tm { font-size: 11px; color: var(--muted); }
+    .pr-best-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--yellow); margin-bottom: 4px; }
+    .pr-best-e1rm { font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+    .pr-best-set { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .pr-spark-row { display: flex; align-items: center; gap: 10px; }
+    .pr-spark-lbl { font-size: 10px; color: var(--muted); }
+    .pr-hist { border-top: 1px solid var(--border); padding-top: 10px; }
+    .pr-hist-row { display: grid; grid-template-columns: 90px 1fr 52px; gap: 6px; padding: 4px 0; border-bottom: 1px solid rgba(36,36,60,.5); font-size: 12px; }
+    .pr-hist-row:last-child { border-bottom: none; }
+    .pr-hist-date { color: var(--muted); }
+    .pr-hist-sets { color: var(--dim); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pr-hist-e { color: #fff; font-weight: 600; text-align: right; }
+    .pr-empty-msg { color: var(--muted); font-size: 13px; font-style: italic; }
+    .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; margin-bottom: 16px; }
+    .chart-hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .chart-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .chart-sub { font-size: 11px; color: var(--muted); }
+    .chart-wrap { overflow: hidden; border-radius: 4px; }
+    .no-data { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 13px; font-style: italic; }
+    .goal-card { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--green); border-radius: var(--r); padding: 18px; margin-bottom: 16px; }
+    .goal-hdr { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+    .goal-title { font-size: 15px; font-weight: 700; color: #fff; }
+    .goal-sub { font-size: 12px; color: var(--muted); }
+    .goal-est { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1; }
+    .goal-target { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .goal-bar-wrap { margin: 12px 0 6px; background: var(--surface2); border-radius: 8px; height: 8px; overflow: hidden; }
+    .goal-bar-fill { height: 100%; border-radius: 8px; background: var(--green); transition: width .6s ease; }
+    .goal-pct-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .goal-achieved { font-size: 15px; font-weight: 700; color: var(--green); }
+    .pace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 680px) { .pace-grid { grid-template-columns: 1fr; } }
+    .prog-hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -309,16 +412,60 @@ const LIFT_PROGRAM = {
   }
 };
 
-// Running: Mon & Fri = Zone 2 (paired with lifting), Wed = Speed
+// Running: Sun = Long Run, Wed = Threshold, Thu = Easy Run
+// 12-week progressive plan targeting 5K improvement from ~14 min/mi baseline
 const RUN_PROGRAM = {
-  schedule: {
-    1: { type: "Zone 2", duration: "25–35 min", notes: "Conversational pace · HR Zone 2 · after OHP session" },
-    3: { type: "Speed", speedAlt: true,
-         weekA: { desc: "5×400m", notes: "Fast reps · full recovery between each" },
-         weekB: { desc: "3×800m", notes: "Moderate-hard effort · ~2 min recovery" },
-         notes: "Alternate weekly" },
-    5: { type: "Zone 2", duration: "25–35 min", notes: "Conversational pace · HR Zone 2 · after Squat session" },
-  }
+  days: [0, 3, 4], // 0=Sun (Long), 3=Wed (Threshold), 4=Thu (Easy)
+  weeks: [
+    // Week 1
+    { 0:{ type:"Long Run",     dist:4.0,   notes:"Slow and steady. Find your comfortable long-run pace — fully conversational." },
+      3:{ type:"Threshold",    desc:"1 mi tempo (2 mi total)", notes:"Easy warmup mile → 1 mi at tempo (comfortably hard, can say a few words) → easy cooldown mile." },
+      4:{ type:"Easy Run",     dist:2.0,   notes:"Fully conversational the whole way. 14 min/mi or slower is perfect." } },
+    // Week 2
+    { 0:{ type:"Long Run",     dist:4.5,   notes:"Steady easy effort. Don't push the pace — just cover the distance." },
+      3:{ type:"Threshold",    desc:"1.25 mi tempo (2.5 mi total)", notes:"Easy warmup → 1.25 mi at tempo effort → cooldown. Keep the tempo portion consistent." },
+      4:{ type:"Easy Run",     dist:2.0,   notes:"Recovery run. Keep it easy." } },
+    // Week 3
+    { 0:{ type:"Long Run",     dist:5.0,   notes:"Stay easy throughout. Run by feel, not by pace." },
+      3:{ type:"Threshold",    desc:"1.5 mi tempo (3 mi total)", notes:"Warmup mile → 1.5 mi at tempo → cooldown. Working hard but in control." },
+      4:{ type:"Easy Run",     dist:2.5,   notes:"Easy aerobic run. Comfortable breathing throughout." } },
+    // Week 4
+    { 0:{ type:"Long Run",     dist:5.0,   notes:"Consistent easy effort. Building that aerobic engine." },
+      3:{ type:"Threshold",    desc:"2×0.75 mi tempo", notes:"2 min walk between reps. Short, sharp efforts — quality over quantity." },
+      4:{ type:"Easy Run",     dist:2.0,   notes:"Easy recovery run." } },
+    // Week 5
+    { 0:{ type:"Long Run",     dist:5.5,   notes:"Patience is key. Run easy and finish strong." },
+      3:{ type:"Threshold",    desc:"2 mi tempo (3 mi total)", notes:"Warmup mile → 2 mi continuous tempo → cooldown. Biggest tempo block yet — stay controlled." },
+      4:{ type:"Easy Run",     dist:2.5,   notes:"Aerobic base run. Comfortable, controlled breathing." } },
+    // Week 6
+    { 0:{ type:"Long Run",     dist:6.0,   notes:"Landmark 6-mile run. Stay easy — trust the base you've built." },
+      3:{ type:"Threshold",    desc:"2 mi tempo continuous", notes:"2 miles straight at tempo — full effort. No warmup/cooldown miles built in." },
+      4:{ type:"Easy Run",     dist:3.0,   notes:"Easy run. Should feel comfortable by now." } },
+    // Week 7
+    { 0:{ type:"Long Run",     dist:6.0,   notes:"Consolidation week — same distance as last week. Run it more confidently." },
+      3:{ type:"Threshold",    desc:"2×1 mi tempo", notes:"2 min walk recovery between reps. Push each mile rep — these are race-prep efforts." },
+      4:{ type:"Easy Run",     dist:2.5,   notes:"Easy recovery run." } },
+    // Week 8
+    { 0:{ type:"Long Run",     dist:6.5,   notes:"New distance PR. Steady, patient effort all the way." },
+      3:{ type:"Threshold",    desc:"2.5 mi tempo (3.5 mi total)", notes:"Warmup mile → 2.5 mi tempo → cooldown. Biggest tempo volume yet — stay controlled." },
+      4:{ type:"Easy Run",     dist:3.0,   notes:"Easy aerobic run." } },
+    // Week 9
+    { 0:{ type:"Long Run",     dist:7.0,   notes:"Peak long run. Stay easy — this is all about time on feet." },
+      3:{ type:"Threshold",    desc:"2 mi + 1 mi tempo", notes:"3 miles of tempo broken up: 2 mi hard, short recovery jog, then 1 mi hard. Race simulation." },
+      4:{ type:"Easy Run",     dist:3.0,   notes:"Easy run. Save the legs for tempo and the long run." } },
+    // Week 10 — Step-back week
+    { 0:{ type:"Long Run",     dist:6.0,   notes:"Step-back week. Shorter long run — recover and absorb all that training." },
+      3:{ type:"Threshold",    desc:"2 mi tempo continuous", notes:"Familiar effort — use it to gauge how much your fitness has grown." },
+      4:{ type:"Easy Run",     dist:2.5,   notes:"Easy recovery run." } },
+    // Week 11 — Taper begins
+    { 0:{ type:"Long Run",     dist:5.0,   notes:"Taper long run. Stay sharp but don't overdo it — legs are freshening up." },
+      3:{ type:"Threshold",    desc:"1.5 mi tempo", notes:"Short, sharp taper tempo. Focus on form and race-pace feel." },
+      4:{ type:"Easy Run",     dist:2.0,   notes:"Easy shakeout. Very relaxed." } },
+    // Week 12 — Test Week
+    { 0:{ type:"5K Time Trial", desc:"Race it!", notes:"Warm up 10–15 min easy → run your best 5K at maximum effort → cool down. This is your benchmark." },
+      3:{ type:"Threshold",    desc:"1 mi tempo", notes:"Final tune-up. Short and sharp — keep the legs awake for Sunday." },
+      4:{ type:"Easy Run",     dist:2.0,   notes:"Light shakeout only. Very easy — save everything for the time trial." } },
+  ]
 };
 
 const MAIN_LIFTS  = ["Squat", "Bench Press", "Deadlift", "Overhead Press"];
@@ -350,7 +497,13 @@ function loadState() {
   } catch(e) {}
   return JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+function saveState() {
+  const json = JSON.stringify(S);
+  localStorage.setItem(STORAGE_KEY, json);
+  // Firefox isolates localStorage per file:// URL, so relay via window.name
+  // (window.name survives same-tab navigations across file:// pages)
+  try { window.name = 'wt:' + json; } catch(e) {}
+}
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -389,10 +542,6 @@ function totalWeeks() {
   return days < 0 ? 0 : Math.floor(days / 7);
 }
 
-function speedRunVariant() {
-  // alternates each calendar week regardless of 4-week cycle
-  return totalWeeks() % 2 === 0 ? "weekA" : "weekB";
-}
 
 function mainLiftSets(lift) {
   const tm = S.settings.trainingMaxes[lift] || 0;
@@ -431,13 +580,18 @@ function nextLiftDay() {
 }
 function nextRunDay() {
   const dow = dayOfWeek(todayStr());
+  const typeNames = { 0:"Long Run", 3:"Threshold", 4:"Easy Run" };
   for (let i=1; i<=7; i++) {
     const d = (dow+i)%7;
-    if (RUN_PROGRAM.schedule[d]) {
-      const r = RUN_PROGRAM.schedule[d];
-      return `${DAY_NAMES[d]} — ${r.type}`;
-    }
+    if (RUN_PROGRAM.days.includes(d)) return `${DAY_NAMES[d]} — ${typeNames[d]}`;
   }
+}
+
+function runForDate(dateStr) {
+  const dow = dayOfWeek(dateStr);
+  if (!RUN_PROGRAM.days.includes(dow)) return null;
+  const wk = Math.min(Math.max(0, totalWeeksToDate(dateStr)), RUN_PROGRAM.weeks.length - 1);
+  return RUN_PROGRAM.weeks[wk][dow] || null;
 }
 
 function weekInCycleForDate(dateStr) {
@@ -476,7 +630,7 @@ function buildCalendar() {
     const isToday = ds === today;
     const isPast  = ds < today;
     const liftW   = LIFT_PROGRAM.schedule[dow] || null;
-    const runW    = RUN_PROGRAM.schedule[dow]  || null;
+    const runW    = runForDate(ds);
     const hasLift = S.liftLogs.some(l => l.date === ds);
     const hasRun  = S.runLogs.some(l  => l.date === ds);
 
@@ -487,23 +641,15 @@ function buildCalendar() {
       schemeHtml = `<span class="cal-scheme">${LIFT_PROGRAM.weekSchemes[wi].label}</span>`;
     }
 
-    // Run variant for speed days
-    let runLabel = "";
-    if (runW) {
-      if (runW.speedAlt) {
-        const variant = totalWeeksToDate(ds) % 2 === 0 ? "weekA" : "weekB";
-        runLabel = runW[variant].desc;
-      } else {
-        runLabel = runW.duration || runW.type;
-      }
-    }
+    const runTagClass = { "Long Run":"cal-tag-long", "Threshold":"cal-tag-thresh", "Easy Run":"cal-tag-easy", "5K Time Trial":"cal-tag-thresh" };
+    const runLabel = runW ? (runW.type === "5K Time Trial" ? "5K Trial" : (runW.desc || runW.type)) : "";
 
     cells.push(`<div class="cal-cell${isToday?" cal-today":isPast?" cal-past":""}" onclick="viewDay('${ds}')">
       <div class="cal-num">
         <span class="${isToday?"cal-num-today":""}">${d}</span>${schemeHtml}
       </div>
       ${liftW ? `<div class="cal-tag cal-tag-lift">${liftAbbr(liftW.mainLift)}</div>` : ""}
-      ${runW  ? `<div class="cal-tag ${runW.speedAlt?"cal-tag-speed":"cal-tag-z2"}">${runLabel}</div>` : ""}
+      ${runW  ? `<div class="cal-tag ${runTagClass[runW.type]||"cal-tag-easy"}">${runLabel}</div>` : ""}
       ${(hasLift||hasRun) ? `<div class="cal-logged">✓</div>` : ""}
     </div>`);
   }
@@ -524,23 +670,326 @@ function buildCalendar() {
     <div class="cal-grid">${cells.join("")}</div>
     <div class="cal-legend">
       <div class="cal-legend-item"><span class="cal-tag cal-tag-lift" style="display:inline-block">Lift</span> Lifting</div>
-      <div class="cal-legend-item"><span class="cal-tag cal-tag-z2" style="display:inline-block">Zone 2</span> Zone 2 run</div>
-      <div class="cal-legend-item"><span class="cal-tag cal-tag-speed" style="display:inline-block">Speed</span> Speed session</div>
+      <div class="cal-legend-item"><span class="cal-tag cal-tag-long" style="display:inline-block">Long Run</span> Long run</div>
+      <div class="cal-legend-item"><span class="cal-tag cal-tag-thresh" style="display:inline-block">Threshold</span> Hard/LT run</div>
+      <div class="cal-legend-item"><span class="cal-tag cal-tag-easy" style="display:inline-block">Easy Run</span> Easy run</div>
       <div class="cal-legend-item" style="color:var(--green);font-weight:700">✓ Logged</div>
     </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  PROGRESS VIEW
+// ═══════════════════════════════════════════════
+
+function fmtPaceVal(s)   { return `${Math.floor(s/60)}:${pad(Math.round(s%60))}`; }
+function fmtDateShort(d) { return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+
+function sparkline(vals, color="#7c3aed", w=120, h=36) {
+  if (!vals || vals.length < 2) return `<span style="font-size:11px;color:var(--muted)">—</span>`;
+  const mn=Math.min(...vals), mx=Math.max(...vals), rng=mx-mn||1;
+  const px=i=>(i/(vals.length-1))*(w-6)+3;
+  const py=v=>h-3-((v-mn)/rng)*(h-6);
+  const pts=vals.map((v,i)=>`${px(i)},${py(v)}`).join(" ");
+  const lx=px(vals.length-1), ly=py(vals[vals.length-1]);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round" opacity=".8"/>
+    <circle cx="${lx}" cy="${ly}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+
+function svgLine(data, { color="#7c3aed", height=130, invertY=false, fmtY=null }={}) {
+  if (!data || data.length < 2) return `<div class="no-data">Not enough data yet — keep logging!</div>`;
+  const vals=data.map(d=>d.y);
+  const mn=Math.min(...vals), mx=Math.max(...vals), rng=mx-mn||1;
+  const PL=46,PR=10,PT=10,PB=26,vW=600,vH=height,W=vW-PL-PR,H=vH-PT-PB;
+  const tx=i=>PL+(i/(data.length-1))*W;
+  const ty=v=>invertY?PT+((v-mn)/rng)*H:PT+H-((v-mn)/rng)*H;
+  const pts=data.map((d,i)=>`${tx(i)},${ty(d.y)}`).join(" ");
+  const gridVs=[mn,(mn+mx)/2,mx];
+  const grid=gridVs.map(v=>{ const y=ty(v),lbl=fmtY?fmtY(v):Math.round(v); return `<line x1="${PL}" y1="${y}" x2="${PL+W}" y2="${y}" stroke="var(--border)" stroke-width="1"/><text x="${PL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="system-ui">${lbl}</text>`; }).join("");
+  const step=Math.max(1,Math.ceil(data.length/7));
+  const xLbls=data.map((d,i)=>i%step===0?`<text x="${tx(i)}" y="${vH-2}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="system-ui">${d.label||""}</text>`:"").join("");
+  const dots=data.map((d,i)=>`<circle cx="${tx(i)}" cy="${ty(d.y)}" r="3" fill="${color}" opacity=".9"/>`).join("");
+  const lastX=tx(data.length-1), baseY=ty(invertY?mx:mn);
+  const area=`<polygon points="${PL},${baseY} ${pts} ${lastX},${baseY}" fill="${color}" opacity=".07"/>`;
+  return `<svg viewBox="0 0 ${vW} ${vH}" style="width:100%;height:${vH}px;display:block">${grid}${area}<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>${dots}${xLbls}</svg>`;
+}
+
+function svgBar(data, { color="#10b981", height=130 }={}) {
+  if (!data || !data.length) return `<div class="no-data">No data yet</div>`;
+  const maxY=Math.max(...data.map(d=>d.y),1);
+  const PL=42,PR=10,PT=10,PB=26,vW=600,vH=height,W=vW-PL-PR,H=vH-PT-PB;
+  const slotW=W/data.length, barW=Math.max(3,slotW-4);
+  const bars=data.map((d,i)=>{ const bh=(d.y/maxY)*H,x=PL+i*slotW+(slotW-barW)/2,y=PT+H-bh; return d.y>0?`<rect x="${x}" y="${y}" width="${barW}" height="${bh}" fill="${color}" rx="2"/>`:`<rect x="${x}" y="${PT+H-2}" width="${barW}" height="2" fill="${color}" opacity=".15" rx="1"/>`;}).join("");
+  const gridVs=[0,maxY/2,maxY];
+  const grid=gridVs.map(v=>{ const y=PT+H-(v/maxY)*H; return `<line x1="${PL}" y1="${y}" x2="${PL+W}" y2="${y}" stroke="var(--border)" stroke-width="1"/><text x="${PL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="system-ui">${Math.round(v)}</text>`;}).join("");
+  const step=Math.max(1,Math.ceil(data.length/7));
+  const xLbls=data.map((d,i)=>i%step===0?`<text x="${PL+i*slotW+slotW/2}" y="${vH-2}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="system-ui">${d.label||""}</text>`:"").join("");
+  return `<svg viewBox="0 0 ${vW} ${vH}" style="width:100%;height:${vH}px;display:block">${grid}${bars}${xLbls}</svg>`;
+}
+
+function liftE1rmHistory(lift, n=12) {
+  return S.liftLogs.filter(l=>l.lift===lift).sort((a,b)=>a.date.localeCompare(b.date)).slice(-n)
+    .map(log=>({ label:fmtDateShort(log.date), y:e1rm(log.sets[log.sets.length-1].weight, log.sets[log.sets.length-1].reps) }));
+}
+
+function liftBest(lift) {
+  let bestE=0, bestSet=null, bestDate=null;
+  for (const log of S.liftLogs.filter(l=>l.lift===lift)) {
+    for (const s of log.sets) { const e=e1rm(s.weight,s.reps); if(e>bestE){bestE=e;bestSet=s;bestDate=log.date;} }
+  }
+  return bestE ? { e1rm:bestE, set:bestSet, date:bestDate } : null;
+}
+
+function weeklyMileage(numWeeks=12) {
+  const today=new Date(); today.setHours(12,0,0,0);
+  const dow=today.getDay();
+  const mon0=new Date(today); mon0.setDate(today.getDate()-(dow===0?6:dow-1)); mon0.setHours(0,0,0,0);
+  const weeks=[];
+  for (let w=numWeeks-1;w>=0;w--) {
+    const mon=new Date(mon0); mon.setDate(mon0.getDate()-w*7);
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+    const miles=S.runLogs.filter(l=>{const d=new Date(l.date+"T12:00:00");return d>=mon&&d<=sun;}).reduce((s,l)=>s+(l.distance||0),0);
+    weeks.push({ label:mon.toLocaleDateString("en-US",{month:"short",day:"numeric"}), y:Math.round(miles*10)/10 });
+  }
+  return weeks;
+}
+
+function paceHistory(type, n=12) {
+  return S.runLogs.filter(l=>l.type===type&&l.distance>0&&l.duration>0)
+    .sort((a,b)=>a.date.localeCompare(b.date)).slice(-n)
+    .map(l=>({ label:fmtDateShort(l.date), y:l.duration/l.distance }));
+}
+
+function best5K() {
+  const runs=S.runLogs.filter(l=>l.distance>=0.5&&l.duration>0);
+  if (!runs.length) return null;
+  const bestPace=Math.min(...runs.map(l=>l.duration/l.distance));
+  const secs=Math.round(bestPace*3.107);
+  const pct=Math.min(100,Math.round(1800/secs*100));
+  return { pace:bestPace, secs, pct };
+}
+
+function runStatsRow() {
+  const totalMiles=S.runLogs.reduce((s,l)=>s+(l.distance||0),0);
+  const today=new Date(); today.setHours(12,0,0,0);
+  const dow=today.getDay();
+  const mon=new Date(today); mon.setDate(today.getDate()-(dow===0?6:dow-1)); mon.setHours(0,0,0,0);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
+  const weekMiles=S.runLogs.filter(l=>{const d=new Date(l.date+"T12:00:00");return d>=mon&&d<=sun;}).reduce((s,l)=>s+(l.distance||0),0);
+  const runs=S.runLogs.filter(l=>l.distance>0&&l.duration>0);
+  const bestPace=runs.length?Math.min(...runs.map(l=>l.duration/l.distance)):0;
+  return { totalMiles:Math.round(totalMiles*10)/10, weekMiles:Math.round(weekMiles*10)/10, bestPace, total:S.runLogs.length };
+}
+
+function setToBeatHtml() {
+  const today=todayStr(), dow=dayOfWeek(today);
+  let liftDay=LIFT_PROGRAM.schedule[dow], label="Today";
+  if (!liftDay) {
+    for (let i=1;i<=7;i++) { const d=(dow+i)%7; if(LIFT_PROGRAM.schedule[d]){liftDay=LIFT_PROGRAM.schedule[d];label=`${DAY_NAMES[d]} (next lift)`;break;} }
+  }
+  if (!liftDay) return "";
+  const wi=weekInCycle(), ws=LIFT_PROGRAM.weekSchemes[wi];
+  const lift=liftDay.mainLift, tm=S.settings.trainingMaxes[lift]||0;
+  const isDeload=wi===3;
+  const sets=ws.sets.map(s=>({weight:roundW(tm*s.pct),reps:s.reps,pct:s.pct}));
+  const lastLog=S.liftLogs.filter(l=>l.lift===lift).sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
+  const lastTop=lastLog?.sets[lastLog.sets.length-1];
+  const lastE=lastTop?e1rm(lastTop.weight,lastTop.reps):0;
+  const setsHtml=sets.map((s,i)=>{
+    const isTop=!isDeload&&i===sets.length-1;
+    const rLbl=isTop?`<span class="amrap-badge">AMRAP</span>${String(s.reps).replace("+","")}+`:s.reps;
+    return `<div class="stb-set${isTop?" top":""}"><span class="stb-set-w">${s.weight} lbs</span><span class="stb-set-r">${rLbl}</span><span class="stb-set-pct">${Math.round(s.pct*100)}%</span></div>`;
+  }).join("");
+  const beatHtml=lastTop
+    ? `<div class="stb-beat-box"><div class="stb-beat-lbl">🎯 Set to Beat</div><div class="stb-beat-val">${lastTop.weight} lbs × ${lastTop.reps} reps</div><div class="stb-beat-e1rm">e1RM: ${lastE} lbs</div><div class="stb-beat-date">${fmtDate(lastLog.date)}</div></div>`
+    : `<div class="stb-beat-box empty"><div class="stb-beat-lbl">🎯 Set to Beat</div><div class="stb-beat-e1rm" style="margin-top:6px">Log your first ${lift} session to start tracking</div></div>`;
+  return `<div class="stb"><div class="stb-row"><div class="stb-day">${label} — ${liftDay.name}</div><div class="stb-scheme-badge">Week ${wi+1} · ${ws.label}</div></div><div class="stb-lift">${lift}</div><div class="stb-body"><div><div class="stb-sets-lbl">Prescribed Sets</div>${setsHtml}</div><div>${beatHtml}</div></div></div>`;
+}
+
+function liftPRCard(lift) {
+  const logs=S.liftLogs.filter(l=>l.lift===lift).sort((a,b)=>b.date.localeCompare(a.date));
+  const tm=S.settings.trainingMaxes[lift]||0;
+  if (!logs.length) return `<div class="pr-card"><div class="pr-card-hdr"><div class="pr-lift">${lift}</div><div class="pr-tm">TM: ${tm} lbs</div></div><div class="pr-empty-msg">No sessions logged yet</div></div>`;
+  const best=liftBest(lift);
+  const sparkVals=liftE1rmHistory(lift,10).map(d=>d.y);
+  const recent=logs.slice(0,5);
+  return `<div class="pr-card">
+    <div class="pr-card-hdr"><div class="pr-lift">${lift}</div><div class="pr-tm">TM: ${tm} lbs</div></div>
+    <div><div class="pr-best-lbl">Best e1RM</div><div class="pr-best-e1rm">${best.e1rm} <span style="font-size:14px;color:var(--muted)">lbs</span></div><div class="pr-best-set">${best.set.weight}×${best.set.reps} · ${fmtDate(best.date)}</div></div>
+    <div class="pr-spark-row">${sparkline(sparkVals,"#7c3aed",120,36)}<div class="pr-spark-lbl">last ${sparkVals.length} sessions<br><span style="color:var(--accent);font-weight:600">e1RM trend</span></div></div>
+    <div class="pr-hist">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;display:grid;grid-template-columns:90px 1fr 52px;gap:6px"><span>Date</span><span>Sets</span><span style="text-align:right">e1RM</span></div>
+      ${recent.map(log=>{ const top=log.sets[log.sets.length-1]; const e=e1rm(top.weight,top.reps); const setStr=log.sets.map(s=>`${s.weight}×${s.reps}`).join(", "); return `<div class="pr-hist-row"><span class="pr-hist-date">${fmtDateShort(log.date)}</span><span class="pr-hist-sets">${setStr}</span><span class="pr-hist-e">${e}</span></div>`; }).join("")}
+    </div>
+  </div>`;
+}
+
+function liftsTab() {
+  return `${setToBeatHtml()}<div class="sec-title">PR Board</div><div class="pr-grid">${MAIN_LIFTS.map(liftPRCard).join("")}</div>`;
+}
+
+function runningTab() {
+  const st=runStatsRow(), goal=best5K(), weekData=weeklyMileage(12);
+  const runTypes=[...new Set(S.runLogs.map(l=>l.type).filter(Boolean))];
+  const statsHtml=`<div class="stats-row">
+    <div class="stat-card"><div class="stat-lbl">Total Miles</div><div class="stat-val">${st.totalMiles}</div><div class="stat-sub">all time</div></div>
+    <div class="stat-card"><div class="stat-lbl">This Week</div><div class="stat-val">${st.weekMiles}</div><div class="stat-sub">miles</div></div>
+    <div class="stat-card"><div class="stat-lbl">Best Pace</div><div class="stat-val" style="font-size:18px">${st.bestPace?fmtPaceVal(st.bestPace)+"<span style='font-size:11px;color:var(--muted)'>/mi</span>":"—"}</div><div class="stat-sub">any run</div></div>
+    <div class="stat-card"><div class="stat-lbl">Runs Logged</div><div class="stat-val">${st.total}</div><div class="stat-sub">total sessions</div></div>
+  </div>`;
+  const mileageChart=`<div class="chart-section"><div class="chart-hdr"><div class="chart-title">Weekly Mileage</div><div class="chart-sub">last 12 weeks</div></div><div class="chart-wrap">${svgBar(weekData,{color:"#10b981",height:140})}</div></div>`;
+  let paceChartsHtml="";
+  if (runTypes.length) {
+    paceChartsHtml=`<div class="pace-grid">${runTypes.map(type=>`<div class="chart-section" style="margin-bottom:0"><div class="chart-hdr"><div class="chart-title">${type} — Pace Trend</div><div class="chart-sub">lower = faster</div></div><div class="chart-wrap">${svgLine(paceHistory(type,12),{color:type==="Long Run"?"#a78bfa":type==="Threshold"?"#f59e0b":"#10b981",height:120,invertY:true,fmtY:fmtPaceVal})}</div></div>`).join("")}</div>`;
+  }
+  let goalHtml="";
+  if (goal) {
+    const achieved=goal.secs<=1800;
+    goalHtml=`<div class="goal-card"><div class="goal-hdr"><div class="goal-title">🏁 Sub-30 5K Goal</div><div class="goal-sub">Target: 30:00</div></div><div class="goal-est">${fmtDur(goal.secs)}</div><div class="goal-target">Estimated 5K · best pace ${fmtPaceVal(goal.pace)}/mi</div><div class="goal-bar-wrap"><div class="goal-bar-fill" style="width:${goal.pct}%"></div></div><div class="goal-pct-row"><span>${goal.pct}% of goal pace</span>${achieved?`<span class="goal-achieved">✓ Goal achieved!</span>`:`<span>${fmtDur(goal.secs-1800)} over target</span>`}</div></div>`;
+  } else if (!S.runLogs.length) {
+    goalHtml=`<div class="chart-section"><div class="no-data">Log some runs to see your 5K goal progress</div></div>`;
+  }
+  const runRows=[...S.runLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);
+  const tableHtml=runRows.length?`<div class="prog-hist-card"><table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th><th></th></tr></thead><tbody>${runRows.map(l=>`<tr><td>${fmtDate(l.date)}</td><td><span class="type-badge type-${(l.type||'').replace(/\s+/g,"-")}">${l.type||'—'}</span></td><td>${l.distance} mi</td><td class="hl">${fmtDur(l.duration)}</td><td>${fmtPace(l.distance,l.duration)}</td><td style="white-space:nowrap"><button class="hist-act-btn" title="Edit" onclick="editRunLog('${l.id}')">✏️</button><button class="hist-act-btn" title="Delete" onclick="deleteRunLog('${l.id}')">🗑️</button></td></tr>`).join("")}</tbody></table></div>`:"";
+  return `${statsHtml}${mileageChart}${paceChartsHtml}${goalHtml}${tableHtml}`;
+}
+
+function modalsHtml() {
+  return `
+  <div class="overlay" id="ov-logger">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-hdr">
+        <h3>Log Workout</h3>
+        <button class="close-btn" onclick="closeOv('ov-logger')">×</button>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="lg-date" onchange="onLogDateChange()"></div>
+      <div class="lg-mode-toggle">
+        <button class="lg-mode-btn active" data-mode="lift" onclick="setLogMode('lift')">🏋️ Lift</button>
+        <button class="lg-mode-btn" data-mode="run" onclick="setLogMode('run')">🏃 Run</button>
+      </div>
+      <div id="lg-lift-panel">
+        <div class="field"><label>Exercise</label>
+          <select id="lg-lift" onchange="onLogLiftChange()">
+            <option value="Squat">Squat</option>
+            <option value="Bench Press">Bench Press</option>
+            <option value="Deadlift">Deadlift</option>
+            <option value="Overhead Press">Overhead Press</option>
+            <option value="__custom__">Other / Custom…</option>
+          </select>
+        </div>
+        <div id="lg-custom-name-wrap" style="display:none">
+          <div class="field"><label>Exercise Name</label><input id="lg-custom-name" placeholder="e.g. Romanian Deadlift, Pull-ups…"></div>
+        </div>
+        <div id="lg-week-hint"></div>
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.8px;color:var(--muted);margin:10px 0 4px">Sets</div>
+        <div id="lg-sets-body"></div>
+        <button class="lg-add-btn" onclick="addSetRow()">+ Add Set</button>
+        <div class="field" style="margin-top:10px"><label>Notes (optional)</label><input id="lg-notes" placeholder="e.g. paused reps, belt, felt strong…"></div>
+      </div>
+      <div id="lg-run-panel" style="display:none">
+        <div class="field"><label>Run Type</label><input id="lg-run-type" placeholder="Easy Run, Long Run, Threshold, Race…"></div>
+        <div class="field"><label>Distance (miles)</label><input type="number" id="lg-run-dist" step="0.1" placeholder="3.0"></div>
+        <div class="field"><label>Time</label>
+          <div class="time-row">
+            <input id="lg-run-h" type="number" min="0" max="23" placeholder="0"> h
+            <input id="lg-run-m" type="number" min="0" max="59" placeholder="30"> m
+            <input id="lg-run-s" type="number" min="0" max="59" placeholder="0"> s
+          </div>
+        </div>
+        <div class="field"><label>Notes (optional)</label><input id="lg-run-notes" placeholder="e.g. avg HR 145, windy, felt easy…"></div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-ghost" onclick="closeOv('ov-logger')">Cancel</button>
+        <button class="btn btn-primary" id="lg-save-btn" onclick="saveWorkout()">Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="overlay" id="ov-settings">
+    <div class="modal">
+      <div class="modal-hdr">
+        <h3>Settings</h3>
+        <button class="close-btn" onclick="closeOv('ov-settings')">×</button>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">Training Maxes (lbs)</div>
+        ${MAIN_LIFTS.map(l => `<div class="field"><label>${l}</label><input type="number" id="tm-${eid(l)}" value="${S.settings.trainingMaxes[l]||""}" placeholder="Enter training max (85–90% of true 1RM)"></div>`).join("")}
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">Program Start Date</div>
+        <div class="field"><input type="date" id="prog-start" value="${S.settings.programStartDate}"></div>
+      </div>
+      <div class="prog-note-banner">
+        <strong>Progression:</strong> After each 4-week cycle, add <strong>+5 lb</strong> to upper lift TMs (Bench, OHP) and <strong>+10 lb</strong> to lower lift TMs (Squat, Deadlift). Keep PR sets at ~1–2 reps in reserve.
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-ghost" onclick="closeOv('ov-settings')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function progressHtml() {
+  const displayDate=new Date().toLocaleDateString("en-US",{weekday:"short",month:"long",day:"numeric"});
+  return `
+  <nav class="page-nav">
+    <a class="pnav-a" style="cursor:pointer" data-view="today">🏠 Today</a>
+    <span class="pnav-sep">/</span>
+    <a class="pnav-a cur">📈 Progress</a>
+    <span class="pnav-sep">/</span>
+    <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
+  </nav>
+  <div class="hdr">
+    <div><h1>Progress</h1><div class="hdr-date">${displayDate}</div></div>
+    <button class="icon-btn" title="Settings" onclick="openSettings()">⚙️</button>
+  </div>
+  <div class="tab-strip">
+    <button class="t-btn${progTab===0?" active":""}" onclick="switchProgTab(0)">🏋️ Lifts</button>
+    <button class="t-btn${progTab===1?" active":""}" onclick="switchProgTab(1)">🏃 Running${S.runLogs.length?" ("+S.runLogs.length+")":""}</button>
+  </div>
+  <div id="prog-tab-content">${progTab===0?liftsTab():runningTab()}</div>
+  ${modalsHtml()}`;
+}
+
+function showView(v, tab) {
+  currentView = v;
+  if (tab !== undefined) progTab = tab;
+  window.scrollTo(0, 0);
+  render();
+}
+
+function switchProgTab(i) {
+  progTab = i;
+  document.querySelectorAll(".t-btn").forEach((b,j)=>b.classList.toggle("active",i===j));
+  document.getElementById("prog-tab-content").innerHTML = i===0?liftsTab():runningTab();
 }
 
 // ═══════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════
 
-let activeTab  = 0;
-let logLiftCtx = null;
-let logRunCtx  = null;
-let calYear    = new Date().getFullYear();
-let calMonth   = new Date().getMonth();
+let activeTab   = 0;
+let calYear     = new Date().getFullYear();
+let calMonth    = new Date().getMonth();
+let currentView = 'today';   // 'today' | 'progress'
+let progTab     = 0;         // 0=Lifts  1=Running  (progress sub-tab)
 
-function render() { document.getElementById("app").innerHTML = html(); }
+function render() {
+  try {
+    document.getElementById("app").innerHTML = currentView === 'progress' ? progressHtml() : html();
+  } catch(e) {
+    document.getElementById("app").innerHTML = `<div style="color:#ef4444;padding:20px;font-family:monospace;font-size:13px"><strong>Render error:</strong><br>${e.message}<br><pre>${e.stack}</pre></div>`;
+    return;
+  }
+  // Attach nav switches via event listener (more reliable than onclick in innerHTML)
+  document.querySelectorAll('[data-view]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      showView(el.dataset.view, el.dataset.tab !== undefined ? parseInt(el.dataset.tab) : undefined);
+    });
+  });
+}
 
 function html() {
   const today = todayStr();
@@ -548,11 +997,19 @@ function html() {
   const wi    = weekInCycle();
   const ws    = LIFT_PROGRAM.weekSchemes[wi];
   const liftW = LIFT_PROGRAM.schedule[dow] || null;
-  const runW  = RUN_PROGRAM.schedule[dow]  || null;
+  const runW  = runForDate(today);
   const displayDate = new Date(today+"T12:00:00").toLocaleDateString("en-US",
     {weekday:"long",month:"long",day:"numeric",year:"numeric"});
 
   return `
+  <nav class="page-nav">
+    <a class="pnav-a cur">🏠 Today</a>
+    <span class="pnav-sep">/</span>
+    <a class="pnav-a" style="cursor:pointer" data-view="progress">📈 Progress</a>
+    <span class="pnav-sep">/</span>
+    <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
+  </nav>
+
   <div class="hdr">
     <div>
       <h1>Workout Tracker</h1>
@@ -568,6 +1025,8 @@ function html() {
     <button class="snav-btn active" onclick="scrollTo('sec-today',this)">Today</button>
     <button class="snav-btn" onclick="scrollTo('sec-cal',this)">Calendar</button>
     <button class="snav-btn" onclick="scrollTo('sec-history',this)">History</button>
+    <span style="flex:1"></span>
+    <button class="btn-log" onclick="openLogger()">+ Log</button>
   </nav>
 
   <section id="sec-today">
@@ -593,47 +1052,79 @@ function html() {
     <div class="hist-wrap" id="hist-content">${histTab(activeTab)}</div>
   </section>
 
-  <!-- Log Lift Modal -->
-  <div class="overlay" id="ov-lift">
-    <div class="modal">
+  <!-- Unified Log Modal -->
+  <div class="overlay" id="ov-logger">
+    <div class="modal" style="max-width:480px">
       <div class="modal-hdr">
-        <h3 id="ml-title">Log Lift</h3>
-        <button class="close-btn" onclick="closeOv('ov-lift')">×</button>
+        <h3>Log Workout</h3>
+        <button class="close-btn" onclick="closeOv('ov-logger')">×</button>
       </div>
-      <div id="ml-sets"></div>
-      <div class="modal-ftr">
-        <button class="btn btn-ghost" onclick="closeOv('ov-lift')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveLift()">Save</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Log Run Modal -->
-  <div class="overlay" id="ov-run">
-    <div class="modal">
-      <div class="modal-hdr">
-        <h3>Log Run</h3>
-        <button class="close-btn" onclick="closeOv('ov-run')">×</button>
-      </div>
       <div class="field">
-        <label>Type</label>
-        <input id="r-type" placeholder="Zone 2, Speed, Tempo…">
+        <label>Date</label>
+        <input type="date" id="lg-date" onchange="onLogDateChange()">
       </div>
-      <div class="field">
-        <label>Distance (miles)</label>
-        <input id="r-dist" type="number" step="0.1" placeholder="3.0">
+
+      <div class="lg-mode-toggle">
+        <button class="lg-mode-btn active" data-mode="lift" onclick="setLogMode('lift')">🏋️ Lift</button>
+        <button class="lg-mode-btn" data-mode="run" onclick="setLogMode('run')">🏃 Run</button>
       </div>
-      <div class="field">
-        <label>Time</label>
-        <div class="time-row">
-          <input id="r-h" type="number" min="0" max="23" placeholder="0"> h
-          <input id="r-m" type="number" min="0" max="59" placeholder="30"> m
-          <input id="r-s" type="number" min="0" max="59" placeholder="0"> s
+
+      <!-- LIFT PANEL -->
+      <div id="lg-lift-panel">
+        <div class="field">
+          <label>Exercise</label>
+          <select id="lg-lift" onchange="onLogLiftChange()">
+            <option value="Squat">Squat</option>
+            <option value="Bench Press">Bench Press</option>
+            <option value="Deadlift">Deadlift</option>
+            <option value="Overhead Press">Overhead Press</option>
+            <option value="__custom__">Other / Custom…</option>
+          </select>
+        </div>
+        <div id="lg-custom-name-wrap" style="display:none">
+          <div class="field">
+            <label>Exercise Name</label>
+            <input id="lg-custom-name" placeholder="e.g. Romanian Deadlift, Pull-ups…">
+          </div>
+        </div>
+        <div id="lg-week-hint"></div>
+        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.8px;color:var(--muted);margin:10px 0 4px">Sets</div>
+        <div id="lg-sets-body"></div>
+        <button class="lg-add-btn" onclick="addSetRow()">+ Add Set</button>
+        <div class="field" style="margin-top:10px">
+          <label>Notes (optional)</label>
+          <input id="lg-notes" placeholder="e.g. paused reps, belt, felt strong…">
         </div>
       </div>
+
+      <!-- RUN PANEL -->
+      <div id="lg-run-panel" style="display:none">
+        <div class="field">
+          <label>Run Type</label>
+          <input id="lg-run-type" placeholder="Easy Run, Long Run, Threshold, Race…">
+        </div>
+        <div class="field">
+          <label>Distance (miles)</label>
+          <input type="number" id="lg-run-dist" step="0.1" placeholder="3.0">
+        </div>
+        <div class="field">
+          <label>Time</label>
+          <div class="time-row">
+            <input id="lg-run-h" type="number" min="0" max="23" placeholder="0"> h
+            <input id="lg-run-m" type="number" min="0" max="59" placeholder="30"> m
+            <input id="lg-run-s" type="number" min="0" max="59" placeholder="0"> s
+          </div>
+        </div>
+        <div class="field">
+          <label>Notes (optional)</label>
+          <input id="lg-run-notes" placeholder="e.g. avg HR 145, windy, felt easy…">
+        </div>
+      </div>
+
       <div class="modal-ftr">
-        <button class="btn btn-ghost" onclick="closeOv('ov-run')">Cancel</button>
-        <button class="btn btn-green" onclick="saveRun()">Save Run</button>
+        <button class="btn btn-ghost" onclick="closeOv('ov-logger')">Cancel</button>
+        <button class="btn btn-primary" id="lg-save-btn" onclick="saveWorkout()">Save</button>
       </div>
     </div>
   </div>
@@ -680,8 +1171,12 @@ function html() {
         <button class="close-btn" onclick="closeOv('ov-day')">×</button>
       </div>
       <div id="day-modal-body"></div>
-      <div class="modal-ftr">
+      <div class="modal-ftr" style="justify-content:space-between">
         <button class="btn btn-ghost" onclick="closeOv('ov-day')">Close</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="logFromDay('run')">+ Run</button>
+          <button class="btn btn-primary" onclick="logFromDay('lift')">+ Lift</button>
+        </div>
       </div>
     </div>
   </div>
@@ -773,14 +1268,22 @@ function liftCard(w) {
 
     ${groupsHtml}
 
+    <div class="prog-block">
+      <div class="prog-block-label">Finisher</div>
+      <div class="prog-single">
+        <span>Incline Treadmill Walk</span>
+        <span class="prog-single-detail">15 min</span>
+      </div>
+      <div class="prog-note">Steep incline · easy walking pace · cooldown</div>
+    </div>
+
     <button class="btn btn-primary log-btn" onclick="openLift('${w.mainLift}','${w.name}')">Log Workout</button>
   </div>`;
 }
 
 function runCard(w) {
-  const isSpeed = w.speedAlt === true;
-  const lr      = lastRun(w.type);
-  const lrHtml  = lr
+  const lr = lastRun(w.type);
+  const lrHtml = lr
     ? `<div class="last-run">
         <div class="ltb-label">Last ${w.type}</div>
         <div class="ltb-value">${lr.distance} mi · ${fmtDur(lr.duration)}</div>
@@ -788,38 +1291,33 @@ function runCard(w) {
       </div>`
     : `<div class="last-run empty">
         <div class="ltb-label">Last ${w.type}</div>
-        <div class="ltb-empty">No runs logged yet</div>
+        <div class="ltb-empty">No ${w.type.toLowerCase()} logged yet</div>
       </div>`;
 
-  let targetHtml;
-  if (isSpeed) {
-    const variant = w[speedRunVariant()];
-    targetHtml = `
-      <div class="run-speed-block">
-        <div class="run-speed-label">This Week</div>
-        <div class="run-speed-desc">${variant.desc}</div>
-        <div class="run-speed-notes">${variant.notes}</div>
-      </div>`;
-  } else {
-    targetHtml = `
-      <div class="run-target">
+  const icons = { "Long Run":"🏃", "Threshold":"⚡", "Easy Run":"🌱", "5K Time Trial":"🏁" };
+  const targetHtml = w.desc
+    ? `<div class="run-speed-block">
+        <div class="run-speed-label">Today's Session</div>
+        <div class="run-speed-desc">${w.desc}</div>
+        <div class="run-speed-notes">${w.notes}</div>
+      </div>`
+    : `<div class="run-target">
         <div>
-          <div class="run-stat-v">${w.duration}</div>
-          <div class="run-stat-l">target</div>
+          <div class="run-stat-v">${w.dist} mi</div>
+          <div class="run-stat-l">target distance</div>
         </div>
-      </div>`;
-  }
+      </div>
+      <div class="run-notes">${w.notes}</div>`;
 
   return `
   <div class="card card-run">
     <div class="card-hdr">
-      <div class="card-icon">${isSpeed ? "⚡" : "🏃"}</div>
-      <div><div class="card-title">${w.type}</div><div class="card-sub">Running</div></div>
+      <div class="card-icon">${icons[w.type] || "🏃"}</div>
+      <div><div class="card-title">${w.type}</div><div class="card-sub">Running · Week ${Math.min(totalWeeks()+1, RUN_PROGRAM.weeks.length)}</div></div>
     </div>
-    <div class="run-notes">${w.notes}</div>
     ${targetHtml}
     ${lrHtml}
-    <button class="btn btn-green log-btn" onclick="openRun('${w.type}','')">Log Run</button>
+    <button class="btn btn-green log-btn" onclick="openRun('${w.type}')">Log Run</button>
   </div>`;
 }
 
@@ -848,9 +1346,18 @@ function histTab(idx) {
     const top  = log.sets[log.sets.length-1];
     const est  = e1rm(top.weight, top.reps);
     const sets = log.sets.map(s => `${s.weight}×${s.reps}`).join(", ");
-    return `<tr><td>${fmtDate(log.date)}</td><td style="color:var(--dim)">${sets}</td><td class="hl">${top.weight}×${top.reps}</td><td class="hl">${est}</td></tr>`;
+    return `<tr>
+      <td>${fmtDate(log.date)}</td>
+      <td style="color:var(--dim)">${sets}</td>
+      <td class="hl">${top.weight}×${top.reps}</td>
+      <td class="hl">${est}</td>
+      <td class="hist-actions">
+        <button class="hist-act-btn" title="Edit" onclick="editLiftLog('${log.id}')">✏️</button>
+        <button class="hist-act-btn" title="Delete" onclick="deleteLiftLog('${log.id}')">🗑️</button>
+      </td>
+    </tr>`;
   }).join("");
-  return `<table><thead><tr><th>Date</th><th>Sets</th><th>Top Set</th><th>e1RM</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table><thead><tr><th>Date</th><th>Sets</th><th>Top Set</th><th>e1RM</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function runHist() {
@@ -859,12 +1366,17 @@ function runHist() {
   const rows = logs.map(l => `
     <tr>
       <td>${fmtDate(l.date)}</td>
-      <td><span class="type-badge type-${l.type.replace(/\s+/g,"-")}">${l.type}</span></td>
+      <td><span class="type-badge type-${(l.type||'').replace(/\s+/g,"-")}">${l.type||'—'}</span></td>
       <td>${l.distance} mi</td>
       <td class="hl">${fmtDur(l.duration)}</td>
       <td>${fmtPace(l.distance,l.duration)}</td>
+      <td class="hist-actions">
+        <button class="hist-act-btn" title="Edit" onclick="editRunLog('${l.id}')">✏️</button>
+        <button class="hist-act-btn" title="Delete" onclick="deleteRunLog('${l.id}')">🗑️</button>
+      </td>
     </tr>`).join("");
-  return `<table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+  <div style="margin-top:10px;text-align:right"><a style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;cursor:pointer" data-view="progress" data-tab="1">📈 View Running Progress →</a></div>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -895,6 +1407,194 @@ function nextMonth() {
   document.getElementById("cal-body").innerHTML = buildCalendar();
 }
 
+// ── Unified Logger ──
+
+let logCtx = { mode: 'lift', date: '', lift: 'Squat', type: '', editId: null };
+let lgSets = [];
+
+function openLogger(opts = {}) {
+  logCtx = {
+    mode:   opts.mode   || 'lift',
+    date:   opts.date   || todayStr(),
+    lift:   opts.lift   || 'Squat',
+    type:   opts.type   || '',
+    editId: opts.editId || null,
+  };
+  document.querySelector('#ov-logger h3').textContent = logCtx.editId ? 'Edit Workout' : 'Log Workout';
+  document.getElementById('lg-date').value = logCtx.date;
+  const liftSel = document.getElementById('lg-lift');
+  liftSel.value = MAIN_LIFTS.includes(logCtx.lift) ? logCtx.lift : '__custom__';
+  if (!MAIN_LIFTS.includes(logCtx.lift) && logCtx.lift) {
+    document.getElementById('lg-custom-name').value = logCtx.lift;
+  }
+  document.getElementById('lg-run-type').value = logCtx.type || '';
+  document.getElementById('lg-notes').value     = opts.notes    || '';
+  document.getElementById('lg-run-notes').value = opts.runNotes || '';
+  document.getElementById('lg-run-dist').value  = opts.dist     || '';
+  const dur = opts.duration || 0;
+  document.getElementById('lg-run-h').value = dur ? (Math.floor(dur/3600) || '') : '';
+  document.getElementById('lg-run-m').value = dur ? (Math.floor((dur%3600)/60) || '') : '';
+  document.getElementById('lg-run-s').value = dur ? (dur%60 || '') : '';
+  setLogMode(logCtx.mode);
+  if (opts.editSets) {
+    lgSets = opts.editSets.map(s => ({ weight: s.weight, reps: s.reps }));
+    document.getElementById('lg-custom-name-wrap').style.display = MAIN_LIFTS.includes(logCtx.lift) ? 'none' : '';
+    document.getElementById('lg-week-hint').innerHTML = `<div class="lg-week-hint">Editing logged session — weights are as recorded</div>`;
+    renderSetRows();
+  } else {
+    refreshSetRows();
+  }
+  document.getElementById('ov-logger').classList.add('open');
+}
+
+function setLogMode(mode) {
+  logCtx.mode = mode;
+  document.querySelectorAll('.lg-mode-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('lg-lift-panel').style.display = mode === 'lift' ? '' : 'none';
+  document.getElementById('lg-run-panel').style.display  = mode === 'run'  ? '' : 'none';
+  document.getElementById('lg-save-btn').textContent = mode === 'lift' ? 'Save Lift' : 'Save Run';
+}
+
+function onLogDateChange() { refreshSetRows(); }
+function onLogLiftChange() { refreshSetRows(); }
+
+function refreshSetRows() {
+  const lift = document.getElementById('lg-lift').value;
+  const date = document.getElementById('lg-date').value || todayStr();
+  const isCustom = lift === '__custom__';
+  document.getElementById('lg-custom-name-wrap').style.display = isCustom ? '' : 'none';
+  if (!isCustom) {
+    const wi = weekInCycleForDate(date);
+    const ws = LIFT_PROGRAM.weekSchemes[wi];
+    const tm = S.settings.trainingMaxes[lift] || 0;
+    const isDeload = wi === 3;
+    lgSets = ws.sets.map((s, i) => ({
+      weight:  roundW(tm * s.pct),
+      reps:    typeof s.reps === 'number' ? s.reps : String(s.reps).replace('+', ''),
+      pct:     s.pct,
+      isAmrap: !isDeload && i === ws.sets.length - 1,
+    }));
+    document.getElementById('lg-week-hint').innerHTML =
+      tm ? `<div class="lg-week-hint">Week ${wi+1} · ${ws.label} · TM: ${tm} lbs</div>` : '';
+  } else {
+    lgSets = [{weight:'',reps:''},{weight:'',reps:''},{weight:'',reps:''}];
+    document.getElementById('lg-week-hint').innerHTML = '';
+  }
+  renderSetRows();
+}
+
+function renderSetRows() {
+  document.getElementById('lg-sets-body').innerHTML = lgSets.map((s, i) => {
+    const lbl = s.isAmrap
+      ? `<span class="amrap-badge">AMRAP</span>${s.pct ? Math.round(s.pct*100)+'%' : ''}`
+      : `Set ${i+1}${s.pct ? ' · '+Math.round(s.pct*100)+'%' : ''}`;
+    return `<div class="lg-set-row">
+      <span class="lg-set-lbl">${lbl}</span>
+      <input type="number" id="lgw-${i}" class="lg-set-input" value="${s.weight}" placeholder="lbs">
+      <span class="lg-x">×</span>
+      <input type="number" id="lgr-${i}" class="lg-set-input" value="${s.reps}" placeholder="reps">
+      <button class="lg-del-btn" onclick="removeSetRow(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function syncSetValues() {
+  lgSets.forEach((_, i) => {
+    const w = document.getElementById(`lgw-${i}`);
+    const r = document.getElementById(`lgr-${i}`);
+    if (w) lgSets[i].weight = w.value;
+    if (r) lgSets[i].reps   = r.value;
+  });
+}
+
+function addSetRow() {
+  syncSetValues();
+  lgSets.push({ weight: '', reps: '' });
+  renderSetRows();
+  setTimeout(() => { const els = document.querySelectorAll('.lg-set-input'); if(els.length) els[els.length-2].focus(); }, 50);
+}
+
+function removeSetRow(i) {
+  if (lgSets.length <= 1) return;
+  syncSetValues();
+  lgSets.splice(i, 1);
+  renderSetRows();
+}
+
+function saveWorkout() {
+  const date = document.getElementById('lg-date').value || todayStr();
+  if (logCtx.mode === 'lift') {
+    const sel      = document.getElementById('lg-lift').value;
+    const isCustom = sel === '__custom__';
+    const liftName = isCustom
+      ? (document.getElementById('lg-custom-name').value.trim() || 'Custom')
+      : sel;
+    const notes = document.getElementById('lg-notes').value.trim();
+    const sets  = lgSets.map((_, i) => ({
+      weight: parseInt(document.getElementById(`lgw-${i}`)?.value) || 0,
+      reps:   parseInt(document.getElementById(`lgr-${i}`)?.value) || 0,
+    })).filter(s => s.weight > 0 && s.reps > 0);
+    if (!sets.length) return;
+    if (logCtx.editId) {
+      const idx = S.liftLogs.findIndex(l => l.id === logCtx.editId);
+      if (idx >= 0) S.liftLogs[idx] = { ...S.liftLogs[idx], date, lift: liftName, sets, notes };
+    } else {
+      S.liftLogs.push({ id: uid(), date, lift: liftName, workout: liftName, sets, notes });
+    }
+  } else {
+    const type     = document.getElementById('lg-run-type').value.trim();
+    const distance = parseFloat(document.getElementById('lg-run-dist').value);
+    const h        = parseInt(document.getElementById('lg-run-h').value) || 0;
+    const m        = parseInt(document.getElementById('lg-run-m').value) || 0;
+    const s        = parseInt(document.getElementById('lg-run-s').value) || 0;
+    const duration = h*3600 + m*60 + s;
+    const notes    = document.getElementById('lg-run-notes').value.trim();
+    if (!type || !distance || !duration) return;
+    if (logCtx.editId) {
+      const idx = S.runLogs.findIndex(l => l.id === logCtx.editId);
+      if (idx >= 0) S.runLogs[idx] = { ...S.runLogs[idx], date, type, distance, duration, notes };
+    } else {
+      S.runLogs.push({ id: uid(), date, type, distance, duration, notes });
+    }
+  }
+  saveState(); closeOv('ov-logger'); render();
+}
+
+// Back-compat: card buttons still call these
+function openLift(lift, workout) { openLogger({ mode: 'lift', lift, date: todayStr() }); }
+function openRun(type)           { openLogger({ mode: 'run',  type, date: todayStr() }); }
+
+// ── Edit / Delete ──
+
+function editLiftLog(id) {
+  const log = S.liftLogs.find(l => l.id === id);
+  if (!log) return;
+  openLogger({ mode: 'lift', date: log.date, lift: log.lift, editId: id, notes: log.notes || '', editSets: log.sets });
+}
+function deleteLiftLog(id) {
+  if (!confirm('Delete this lift session?')) return;
+  S.liftLogs = S.liftLogs.filter(l => l.id !== id);
+  saveState(); render();
+}
+function editRunLog(id) {
+  const log = S.runLogs.find(l => l.id === id);
+  if (!log) return;
+  openLogger({ mode: 'run', date: log.date, type: log.type, editId: id, dist: log.distance, duration: log.duration, runNotes: log.notes || '' });
+}
+function deleteRunLog(id) {
+  if (!confirm('Delete this run?')) return;
+  S.runLogs = S.runLogs.filter(l => l.id !== id);
+  saveState(); render();
+}
+
+// Log from day-preview modal
+let _dayPreviewDate = '';
+function logFromDay(mode) {
+  closeOv('ov-day');
+  openLogger({ mode, date: _dayPreviewDate, lift: LIFT_PROGRAM.schedule[dayOfWeek(_dayPreviewDate)]?.mainLift || 'Squat' });
+}
+
 function setsForWeek(lift, weekIdx) {
   const tm = S.settings.trainingMaxes[lift] || 0;
   return LIFT_PROGRAM.weekSchemes[weekIdx].sets.map(s => ({
@@ -908,11 +1608,12 @@ function fmtDateLong(ds) {
 }
 
 function viewDay(ds) {
+  _dayPreviewDate = ds;
   const dow   = dayOfWeek(ds);
   const wi    = weekInCycleForDate(ds);
   const ws    = LIFT_PROGRAM.weekSchemes[wi];
   const liftW = LIFT_PROGRAM.schedule[dow] || null;
-  const runW  = RUN_PROGRAM.schedule[dow]  || null;
+  const runW  = runForDate(ds);
   const isDeload = wi === 3;
 
   document.getElementById("day-modal-date").textContent = fmtDateLong(ds);
@@ -965,14 +1666,10 @@ function viewDay(ds) {
   }
 
   if (runW) {
-    let target = "";
-    if (runW.speedAlt) {
-      const variant = totalWeeksToDate(ds) % 2 === 0 ? "weekA" : "weekB";
-      target = `<div class="day-run-type">${runW[variant].desc}</div><div class="day-run-target">${runW[variant].notes}</div>`;
-    } else {
-      target = `<div class="day-run-type">${runW.duration}</div><div class="day-run-target">${runW.notes}</div>`;
-    }
-    body += `<div class="day-section"><div class="day-section-lbl">${runW.type} Run</div>${target}</div>`;
+    const target = runW.desc
+      ? `<div class="day-run-type">${runW.desc}</div><div class="day-run-target">${runW.notes}</div>`
+      : `<div class="day-run-type">${runW.dist} mi</div><div class="day-run-target">${runW.notes}</div>`;
+    body += `<div class="day-section"><div class="day-section-lbl">${runW.type}</div>${target}</div>`;
   } else {
     body += `<div class="day-section"><div class="day-rest">No run scheduled.</div></div>`;
   }
@@ -981,52 +1678,7 @@ function viewDay(ds) {
   document.getElementById("ov-day").classList.add("open");
 }
 
-function openLift(lift, workout) {
-  logLiftCtx = { lift, workout };
-  document.getElementById("ml-title").textContent = `Log ${lift}`;
-  const sets = mainLiftSets(lift);
-  document.getElementById("ml-sets").innerHTML = sets.map((s,i) => `
-    <div class="log-set-row">
-      <span class="log-set-lbl">Set ${i+1} · ${Math.round(s.pct*100)}%</span>
-      <input type="number" id="lw-${i}" value="${s.weight}" placeholder="lbs">
-      <span class="log-x">×</span>
-      <input type="number" id="lr-${i}" value="${typeof s.reps==="number"?s.reps:""}" placeholder="${s.reps}">
-    </div>`).join("");
-  document.getElementById("ov-lift").classList.add("open");
-}
 
-function openRun(type) {
-  document.getElementById("r-type").value = type;
-  document.getElementById("r-dist").value = "";
-  document.getElementById("r-h").value    = "";
-  document.getElementById("r-m").value    = "";
-  document.getElementById("r-s").value    = "";
-  document.getElementById("ov-run").classList.add("open");
-}
-
-function saveLift() {
-  if (!logLiftCtx) return;
-  const sets   = mainLiftSets(logLiftCtx.lift);
-  const logged = sets.map((_,i) => ({
-    weight: parseInt(document.getElementById(`lw-${i}`).value)||0,
-    reps:   parseInt(document.getElementById(`lr-${i}`).value)||0,
-  })).filter(s => s.weight>0 && s.reps>0);
-  if (!logged.length) return;
-  S.liftLogs.push({ id:uid(), date:todayStr(), lift:logLiftCtx.lift, workout:logLiftCtx.workout, sets:logged });
-  saveState(); closeOv("ov-lift"); render();
-}
-
-function saveRun() {
-  const type     = document.getElementById("r-type").value.trim();
-  const distance = parseFloat(document.getElementById("r-dist").value);
-  const h        = parseInt(document.getElementById("r-h").value)||0;
-  const m        = parseInt(document.getElementById("r-m").value)||0;
-  const s        = parseInt(document.getElementById("r-s").value)||0;
-  const duration = h*3600 + m*60 + s;
-  if (!type || !distance || !duration) return;
-  S.runLogs.push({ id:uid(), date:todayStr(), type, distance, duration });
-  saveState(); closeOv("ov-run"); render();
-}
 
 function saveSettings() {
   MAIN_LIFTS.forEach(l => {
@@ -1046,6 +1698,12 @@ document.addEventListener("click", e => {
 // ═══════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('view') === 'progress') currentView = 'progress';
+  const tab = p.get('tab');
+  if (tab !== null) progTab = parseInt(tab);
+})();
 render();
 </script>
 </body>

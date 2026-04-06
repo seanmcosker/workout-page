@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Redirecting…</title>
+<script>
+  const p = new URLSearchParams(window.location.search);
+  const tab = p.get('tab');
+  window.location.replace('index.html?view=progress' + (tab ? '&tab=' + tab : ''));
+</script>
+</head>
+<body></body>
+</html>

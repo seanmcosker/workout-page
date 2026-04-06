@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Health Import — Workout Tracker</title>
+  <style>
+    :root {
+      --bg: #0d0d14; --surface: #13131e; --surface2: #1b1b2e; --border: #24243c;
+      --accent: #7c3aed; --accent-h: #6d28d9; --green: #10b981; --green-h: #059669;
+      --text: #e2e8f0; --dim: #94a3b8; --muted: #4a5570;
+      --yellow: #f59e0b; --red: #ef4444; --r: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; min-height: 100vh; font-size: 14px; line-height: 1.5; }
+    #app { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
+
+    .page-nav { display: flex; align-items: center; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .pnav-a { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; transition: all .15s; }
+    .pnav-a:hover { background: var(--surface2); color: var(--text); }
+    .pnav-a.cur { background: var(--surface2); color: var(--accent); }
+    .pnav-sep { color: var(--border); font-size: 16px; }
+
+    .hdr { margin-bottom: 28px; }
+    .hdr-title { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .hdr-sub { font-size: 14px; color: var(--dim); margin-top: 4px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 16px; }
+    .card-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 10px; }
+    .step { display: flex; gap: 12px; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 24px; height: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); }
+    .step-text { font-size: 13px; color: var(--dim); line-height: 1.5; }
+    .step-text strong { color: var(--text); }
+    .step-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Drop zone */
+    .drop-zone { border: 2px dashed var(--border); border-radius: var(--r); padding: 40px 24px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(124,58,237,.05); }
+    .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop-icon { font-size: 36px; margin-bottom: 12px; }
+    .drop-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .drop-sub { font-size: 12px; color: var(--muted); }
+
+    /* Loading */
+    .loading-wrap { text-align: center; padding: 32px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-size: 15px; font-weight: 600; color: #fff; }
+    .loading-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .progress-bar-wrap { background: var(--surface2); border-radius: 8px; height: 4px; margin: 16px auto 0; max-width: 200px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 8px; transition: width .3s; }
+
+    /* Preview */
+    .found-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
+    @media (max-width: 500px) { .found-grid { grid-template-columns: 1fr; } }
+    .found-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+    .found-icon { font-size: 22px; }
+    .found-count { font-size: 20px; font-weight: 800; color: #fff; }
+    .found-label { font-size: 12px; color: var(--muted); }
+    .found-skip { font-size: 11px; color: var(--yellow); margin-top: 2px; }
+    .found-none { opacity: .4; }
+
+    /* Import options */
+    .opt-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .opt-row:last-child { border-bottom: none; }
+    .opt-check { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+    .opt-label { font-size: 13px; color: var(--text); flex: 1; }
+    .opt-count { font-size: 12px; color: var(--muted); }
+
+    /* Run type selector */
+    .run-type-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+    .run-type-row label { font-size: 13px; color: var(--dim); }
+    .run-type-row select { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; color: var(--text); font-size: 13px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ghost { background: transparent; color: var(--dim); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+    /* Success */
+    .success-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+    .success-title { font-size: 18px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 8px; }
+    .result-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--border); }
+    .result-row:last-child { border-bottom: none; }
+    .result-dot { color: var(--green); font-weight: 700; font-size: 16px; }
+    .success-links { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+
+    /* Warning */
+    .warn-banner { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #fcd34d; line-height: 1.5; margin-bottom: 12px; }
+    .sec-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <nav class="page-nav">
+    <a href="index.html" class="pnav-a">🏠 Today</a>
+    <span class="pnav-sep">/</span>
+    <a href="progress.html" class="pnav-a">📈 Progress</a>
+    <span class="pnav-sep">/</span>
+    <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
+    <span class="pnav-sep">/</span>
+    <a href="import.html" class="pnav-a cur">🍎 Import</a>
+  </nav>
+
+  <div class="hdr">
+    <div class="hdr-title">🍎 Apple Health Import</div>
+    <div class="hdr-sub">Pull your runs, resting heart rate, HRV, weight, and body fat directly from your Health export</div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="card" id="instructions">
+    <div class="card-title">How to export from Apple Health</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Open the <strong>Health app</strong> on your iPhone → tap your <strong>profile photo</strong> (top right)</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Scroll down → tap <strong>Export All Health Data</strong> → confirm → share/save the <strong>.zip</strong> to your Mac</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Unzip</strong> the file — you'll find <strong>export.xml</strong> inside the apple_health_export folder</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Select <strong>export.xml</strong> below — everything stays local, nothing is uploaded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="card" id="drop-card">
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".xml" onchange="onFileSelected(event)">
+      <div class="drop-icon">📂</div>
+      <div class="drop-title">Drop export.xml here</div>
+      <div class="drop-sub">or click to browse — file stays on your device</div>
+    </div>
+  </div>
+
+  <!-- States rendered by JS -->
+  <div id="state-area"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE (shared localStorage with all pages)
+// ═══════════════════════════════════════════════
+
+const STORAGE_KEY = "wt-v1";
+function loadState() {
+  try { const r=localStorage.getItem(STORAGE_KEY); if(r){ const p=JSON.parse(r); return p; } } catch(e){}
+  return { settings:{}, liftLogs:[], runLogs:[], bodyLogs:[] };
+}
+function saveState(S) { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+
+function pad(n) { return String(n).padStart(2,"0"); }
+function uid()  { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function fmtDur(s) { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return h?`${h}:${pad(m)}:${pad(ss)}`:`${m}:${pad(ss)}`; }
+
+// ═══════════════════════════════════════════════
+//  DRAG & DROP
+// ═══════════════════════════════════════════════
+
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+
+function onFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+
+// ═══════════════════════════════════════════════
+//  FILE PROCESSING
+// ═══════════════════════════════════════════════
+
+let parsed = null;
+
+function processFile(file) {
+  document.getElementById('state-area').innerHTML = `
+    <div class="card">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-title">Parsing ${file.name}…</div>
+        <div class="loading-sub">Large exports can take 10–30 seconds</div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog" style="width:5%"></div></div>
+      </div>
+    </div>`;
+
+  const reader = new FileReader();
+  reader.onprogress = e => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 60) + 5;
+      const p = document.getElementById('prog');
+      if (p) p.style.width = pct + '%';
+    }
+  };
+  reader.onload = e => {
+    const p = document.getElementById('prog');
+    if (p) p.style.width = '75%';
+    // yield to browser to update UI
+    setTimeout(() => {
+      try {
+        parsed = parseHealthXML(e.target.result);
+        const p2 = document.getElementById('prog');
+        if (p2) p2.style.width = '100%';
+        setTimeout(() => showPreview(), 200);
+      } catch(err) {
+        document.getElementById('state-area').innerHTML =
+          `<div class="card"><div style="color:var(--red);padding:16px">Error parsing file: ${err.message}</div></div>`;
+      }
+    }, 50);
+  };
+  reader.onerror = () => {
+    document.getElementById('state-area').innerHTML =
+      `<div class="card"><div style="color:var(--red);padding:16px">Failed to read file.</div></div>`;
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════
+//  PARSER  (regex-based, fast for large files)
+// ═══════════════════════════════════════════════
+
+function parseHealthXML(text) {
+  const S = loadState();
+  const existingRunDates = new Set(S.runLogs.map(l => l.date));
+  const existingBodyDates = new Set((S.bodyLogs||[]).map(l => l.date));
+
+  const result = {
+    runs:    [],
+    rhr:     new Map(),  // date → value
+    hrv:     new Map(),  // date → [values]
+    weight:  new Map(),  // date → value
+    bodyFat: new Map(),  // date → value
+  };
+
+  // ── Running workouts ──
+  const wRe = /<Workout\s[^>]*workoutActivityType="HKWorkoutActivityTypeRunning"[^>]*>([\s\S]*?)<\/Workout>/g;
+  let m;
+  while ((m = wRe.exec(text)) !== null) {
+    const outer = m[0], inner = m[1];
+    const startDate = (outer.match(/\bstartDate="([^"]+)"/) || [])[1];
+    const dur       = parseFloat((outer.match(/\bduration="([^"]+)"/) || [])[1]);
+    const dist      = parseFloat((outer.match(/\btotalDistance="([^"]+)"/) || [])[1]);
+    const distUnit  = (outer.match(/\btotalDistanceUnit="([^"]+)"/) || [])[1];
+    const hrAvgM    = inner.match(/type="HKQuantityTypeIdentifierHeartRate"[^>]*average="([^"]+)"/);
+    const avgHR     = hrAvgM ? parseFloat(hrAvgM[1]) : null;
+
+    if (!startDate || isNaN(dur) || isNaN(dist) || dist <= 0) continue;
+
+    const date      = startDate.split(' ')[0];
+    const distMi    = distUnit === 'km' ? dist * 0.621371 : dist;
+    const durSecs   = Math.round(dur * 60);
+
+    // Smart type guess
+    let type = 'Easy Run';
+    if (dur > 55) type = 'Long Run';
+    else if (avgHR && avgHR > 153) type = 'Threshold';
+
+    result.runs.push({
+      date,
+      distance: Math.round(distMi * 100) / 100,
+      duration: durSecs,
+      type,
+      avgHR,
+      isNew: !existingRunDates.has(date),
+    });
+  }
+
+  // ── Health records ──
+  // Self-closing records: <Record ... />
+  // Also records with children: <Record ...>...</Record>
+  const rRe = /<Record\b([^>]*?)(?:\/?>)/g;
+  while ((m = rRe.exec(text)) !== null) {
+    const attrs = m[1];
+    const getA  = key => { const r = new RegExp(`\\b${key}="([^"]+)"`); return (attrs.match(r)||[])[1]; };
+    const type  = getA('type');
+    const val   = parseFloat(getA('value'));
+    const date  = (getA('startDate')||'').split(' ')[0];
+    const unit  = getA('unit');
+
+    if (!type || !date || isNaN(val)) continue;
+
+    switch (type) {
+      case 'HKQuantityTypeIdentifierRestingHeartRate':
+        if (!result.rhr.has(date) || val < result.rhr.get(date))
+          result.rhr.set(date, Math.round(val));
+        break;
+      case 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN':
+        if (!result.hrv.has(date)) result.hrv.set(date, []);
+        result.hrv.get(date).push(val);
+        break;
+      case 'HKQuantityTypeIdentifierBodyMass': {
+        const lbs = unit === 'kg' ? val * 2.20462 : val;
+        if (!result.weight.has(date)) result.weight.set(date, Math.round(lbs * 10) / 10);
+        break;
+      }
+      case 'HKQuantityTypeIdentifierBodyFatPercentage':
+        // Apple stores as % (e.g. 18.5)
+        if (!result.bodyFat.has(date)) result.bodyFat.set(date, Math.round(val * 10) / 10);
+        break;
+    }
+  }
+
+  // Average HRV per day
+  result.hrv.forEach((vals, date) => {
+    result.hrv.set(date, Math.round(vals.reduce((a,b)=>a+b,0)/vals.length));
+  });
+
+  // Mark body metric dates as new/existing
+  result.rhrNew     = [...result.rhr.keys()].filter(d => !existingBodyDates.has(d)).length;
+  result.hrvNew     = [...result.hrv.keys()].filter(d => !existingBodyDates.has(d)).length;
+  result.weightNew  = [...result.weight.keys()].filter(d => !existingBodyDates.has(d)).length;
+  result.bodyFatNew = [...result.bodyFat.keys()].filter(d => !existingBodyDates.has(d)).length;
+
+  return result;
+}
+
+// ═══════════════════════════════════════════════
+//  PREVIEW
+// ═══════════════════════════════════════════════
+
+function showPreview() {
+  const p = parsed;
+  const runsNew  = p.runs.filter(r => r.isNew).length;
+  const runsSkip = p.runs.length - runsNew;
+
+  function foundItem(icon, count, label, skipCount=0, newCount=null) {
+    const nc = newCount ?? count;
+    const isEmpty = count === 0;
+    return `<div class="found-item${isEmpty?' found-none':''}">
+      <div class="found-icon">${icon}</div>
+      <div>
+        <div class="found-count">${count.toLocaleString()}</div>
+        <div class="found-label">${label}</div>
+        ${skipCount > 0 ? `<div class="found-skip">${skipCount} already logged → will skip</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  const hasRuns   = p.runs.length > 0;
+  const hasRHR    = p.rhr.size > 0;
+  const hasHRV    = p.hrv.size > 0;
+  const hasWeight = p.weight.size > 0;
+  const hasBF     = p.bodyFat.size > 0;
+  const hasBody   = hasRHR || hasHRV || hasWeight || hasBF;
+
+  if (!hasRuns && !hasBody) {
+    document.getElementById('state-area').innerHTML = `
+      <div class="card" style="text-align:center;padding:32px;color:var(--muted)">
+        No running workouts or health metrics found.<br>
+        <span style="font-size:12px">Make sure you selected the correct export.xml file.</span>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('state-area').innerHTML = `
+  <div class="card">
+    <div class="sec-label">Found in export</div>
+    <div class="found-grid">
+      ${foundItem('🏃', p.runs.length, 'Running workouts', runsSkip)}
+      ${foundItem('❤️', p.rhr.size, 'Days of resting HR')}
+      ${foundItem('💙', p.hrv.size, 'Days of HRV')}
+      ${foundItem('⚖️', p.weight.size, 'Weight entries')}
+      ${foundItem('📊', p.bodyFat.size, 'Body fat entries')}
+    </div>
+
+    <div class="sec-label">Import options</div>
+    <div>
+      ${hasRuns ? `<div class="opt-row">
+        <input type="checkbox" class="opt-check" id="opt-runs" checked>
+        <label class="opt-label" for="opt-runs">Running workouts</label>
+        <span class="opt-count">${runsNew} new${runsSkip ? `, ${runsSkip} skipped` : ''}</span>
+      </div>` : ''}
+      ${hasBody ? `<div class="opt-row">
+        <input type="checkbox" class="opt-check" id="opt-body" checked>
+        <label class="opt-label" for="opt-body">Body metrics (RHR, HRV, weight, body fat)</label>
+        <span class="opt-count">${Math.max(p.rhr.size, p.hrv.size, p.weight.size, p.bodyFat.size)} days</span>
+      </div>` : ''}
+    </div>
+
+    ${hasRuns ? `
+    <div style="margin-top:12px">
+      <div class="sec-label">Run type — when Apple Health data can't determine type</div>
+      <div class="warn-banner">
+        Runs are auto-classified based on duration &amp; heart rate. You can change individual runs after import in the History tab.
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        &gt; 55 min → <strong style="color:#a78bfa">Long Run</strong> &nbsp;·&nbsp;
+        HR &gt; 153 → <strong style="color:#fbbf24">Threshold</strong> &nbsp;·&nbsp;
+        everything else → <strong style="color:#34d399">Easy Run</strong>
+      </div>
+    </div>` : ''}
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="document.getElementById('state-area').innerHTML=''">Cancel</button>
+      <button class="btn btn-primary" onclick="doImport()">Import →</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  IMPORT
+// ═══════════════════════════════════════════════
+
+function doImport() {
+  const importRuns = document.getElementById('opt-runs')?.checked ?? false;
+  const importBody = document.getElementById('opt-body')?.checked ?? false;
+
+  const S = loadState();
+  if (!S.bodyLogs) S.bodyLogs = [];
+
+  let runsAdded = 0, bodyDaysAdded = 0;
+
+  if (importRuns && parsed.runs.length) {
+    const existingDates = new Set(S.runLogs.map(l => l.date));
+    for (const run of parsed.runs) {
+      if (existingDates.has(run.date)) continue;
+      S.runLogs.push({
+        id: uid(),
+        date: run.date,
+        type: run.type,
+        distance: run.distance,
+        duration: run.duration,
+        notes: run.avgHR ? `Avg HR: ${Math.round(run.avgHR)} bpm (imported from Apple Health)` : 'Imported from Apple Health',
+      });
+      existingDates.add(run.date);
+      runsAdded++;
+    }
+  }
+
+  if (importBody) {
+    // Merge all body metric dates
+    const allDates = new Set([
+      ...parsed.rhr.keys(),
+      ...parsed.hrv.keys(),
+      ...parsed.weight.keys(),
+      ...parsed.bodyFat.keys(),
+    ]);
+
+    const existingMap = new Map(S.bodyLogs.map(l => [l.date, l]));
+
+    for (const date of [...allDates].sort()) {
+      if (existingMap.has(date)) continue; // don't overwrite manually entered data
+      const entry = {
+        id:      uid(),
+        date,
+        weight:  parsed.weight.has(date)  ? parsed.weight.get(date)  : null,
+        bodyFat: parsed.bodyFat.has(date) ? parsed.bodyFat.get(date) : null,
+        rhr:     parsed.rhr.has(date)     ? parsed.rhr.get(date)     : null,
+        hrv:     parsed.hrv.has(date)     ? parsed.hrv.get(date)     : null,
+        notes:   'Imported from Apple Health',
+      };
+      S.bodyLogs.push(entry);
+      bodyDaysAdded++;
+    }
+  }
+
+  saveState(S);
+
+  // Show results
+  document.getElementById('state-area').innerHTML = `
+  <div class="card" style="text-align:center">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Import complete!</div>
+    <div style="max-width:380px;margin:16px auto 0;text-align:left">
+      ${runsAdded   > 0 ? `<div class="result-row"><span class="result-dot">•</span> ${runsAdded} run${runsAdded!==1?'s':''} added to Running log</div>` : ''}
+      ${bodyDaysAdded>0 ? `<div class="result-row"><span class="result-dot">•</span> ${bodyDaysAdded} days of body metrics added</div>` : ''}
+      ${runsAdded===0 && bodyDaysAdded===0 ? `<div class="result-row" style="color:var(--muted)">Nothing new to import — all data already existed.</div>` : ''}
+    </div>
+    <div class="success-links">
+      <a href="index.html" class="btn btn-ghost">🏠 Today</a>
+      <a href="progress.html" class="btn btn-ghost">📈 Running Progress</a>
+      <a href="metrics.html" class="btn btn-primary">⚖️ View Metrics</a>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>
