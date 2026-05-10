@@ -325,6 +325,39 @@
     .pace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     @media (max-width: 680px) { .pace-grid { grid-template-columns: 1fr; } }
     .prog-hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-top: 16px; }
+
+    /* ── Chat / Coach ── */
+    .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 180px); min-height: 420px; }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 20px 0 8px; }
+    .chat-msg { display: flex; flex-direction: column; max-width: 82%; }
+    .chat-msg.user { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.assistant { align-self: flex-start; align-items: flex-start; }
+    .chat-bubble { padding: 11px 15px; border-radius: 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .chat-msg.user .chat-bubble { background: var(--accent); color: #fff; border-radius: 14px 14px 3px 14px; }
+    .chat-msg.assistant .chat-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 14px 14px 14px 3px; }
+    .chat-role { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 4px; }
+    .chat-input-row { display: flex; gap: 8px; padding: 12px 0 4px; border-top: 1px solid var(--border); margin-top: 4px; }
+    .chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 14px; font-family: inherit; resize: none; min-height: 44px; max-height: 130px; outline: none; transition: border-color .15s; }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-input::placeholder { color: var(--muted); }
+    .chat-send { background: var(--accent); border: none; border-radius: 10px; padding: 10px 18px; color: #fff; cursor: pointer; font-size: 14px; font-weight: 700; transition: background .15s; align-self: flex-end; }
+    .chat-send:hover { background: var(--accent-h); }
+    .chat-send:disabled { opacity: .35; cursor: not-allowed; }
+    .chat-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 48px 20px; line-height: 1.7; }
+    .chat-empty strong { display: block; color: var(--dim); font-size: 15px; margin-bottom: 8px; }
+    .chat-thinking { display: flex; gap: 5px; align-items: center; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px 14px 14px 3px; width: fit-content; }
+    .chat-thinking span { width: 7px; height: 7px; background: var(--muted); border-radius: 50%; animation: ctbounce 1.3s infinite ease-in-out; }
+    .chat-thinking span:nth-child(2) { animation-delay: .2s; }
+    .chat-thinking span:nth-child(3) { animation-delay: .4s; }
+    @keyframes ctbounce { 0%,80%,100% { transform: translateY(0); opacity:.4; } 40% { transform: translateY(-7px); opacity:1; } }
+    .chat-err { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3); border-radius: 10px; padding: 10px 14px; color: var(--red); font-size: 13px; margin: 4px 0; }
+    .chat-nokey { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 28px 24px; text-align: center; margin: 24px 0; }
+    .chat-nokey h3 { color: #fff; font-size: 16px; margin-bottom: 8px; }
+    .chat-nokey p { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+    .chat-suggestion-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .chat-suggestion { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--dim); cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .chat-suggestion:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,58,237,.08); }
+    .api-key-note { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
   </style>
 </head>
 <body>
@@ -347,49 +380,58 @@ const LIFT_PROGRAM = {
     1: { // Monday
       name: "OHP Day",
       mainLift: "Overhead Press",
+      warmup: [
+        { name: "Band Pull-Aparts",  sets: 2, reps: "15" },
+        { name: "Wall Slides",       sets: 2, reps: "10" },
+        { name: "Dead Hangs",        sets: 2, reps: "20 sec" },
+      ],
       powerPrimer: { name: "Med Ball Chest Pass / Overhead Slam", sets: 4, reps: "5" },
-      heavyComplement: { name: "Weighted Dips", sets: 5, reps: "5" },
-      circuit: { note: "50 each total", exercises: ["Pushups", "Pullups", "Walking Lunges"] },
+      circuit: { note: "25 each total", exercises: ["Dips", "Pullups", "Walking Lunges"] },
       groups: [
-        { label: "Arm / Shoulder Tri-Set · 3 rounds", items: [
-            { name: "DB Lateral Raises",    reps: "15" },
-            { name: "EZ-Bar Curls",         reps: "12" },
-            { name: "Cable Rope Pushdowns", reps: "12" },
+        { label: "Shoulder", items: [
+            { name: "DB Lateral Raises", sets: 3, reps: "15" },
         ]},
         { label: "Grappling Assistance · 3 rounds", items: [
-            { name: "Face Pulls",              reps: "15" },
-            { name: "Neck Flexion/Extension",  reps: "15" },
+            { name: "Face Pulls",             reps: "15" },
+            { name: "Neck Flexion/Extension", reps: "15" },
         ]},
       ],
     },
     2: { // Tuesday
       name: "Deadlift Day",
       mainLift: "Deadlift",
-      powerPrimer: { name: "Broad Jumps", sets: 5, reps: "3" },
-      heavyComplement: { name: "Front Squat", sets: 5, reps: "3" },
-      circuit: { note: "50 each total", exercises: ["Hanging Knee Raises", "Inverted Rows", "Reverse Lunges"] },
+      warmup: [
+        { name: "Hip 90/90 Switches", sets: 1, reps: "5 each side" },
+        { name: "Glute Bridges",      sets: 2, reps: "15" },
+        { name: "Goblet Squat",       sets: 2, reps: "8", note: "light KB/DB · hip opener" },
+      ],
+      powerPrimer: { name: "Power Cleans", sets: 5, reps: "3", note: "60–70% · fast reps only" },
+      circuit: { note: "50 each total", exercises: ["Pushups", "Inverted Rows", "Back Raises"] },
       groups: [
         { label: "Grappling Assistance", items: [
             { name: "Farmer Carries", sets: 4, reps: "45–60 sec" },
         ]},
-        { label: "Optional", items: [
-            { name: "Hammer Curls", sets: 3, reps: "12" },
-        ]},
+      ],
+      runPrehab: [
+        { name: "Single-Leg Calf Raises",       sets: 2, reps: "15 each" },
+        { name: "Tibialis Raises",              sets: 3, reps: "15" },
+        { name: "Terminal Knee Extensions",     sets: 2, reps: "15 each" },
+        { name: "Lacrosse Ball Stands",          sets: 1, reps: "60 sec each" },
       ],
     },
     4: { // Thursday
       name: "Bench Day",
       mainLift: "Bench Press",
-      powerPrimer: { name: "Power Cleans", sets: 5, reps: "3", note: "60–70% of clean max · fast reps only, no grinding" },
-      heavyComplement: { name: "Weighted Chinups", sets: 5, reps: "5" },
-      circuit: { note: "50 each total", exercises: ["Pushups", "Ring Rows", "Step-ups"] },
+      warmup: [
+        { name: "Band Pull-Aparts",  sets: 2, reps: "15" },
+        { name: "Wall Slides",       sets: 2, reps: "10" },
+        { name: "Dead Hangs",        sets: 2, reps: "20 sec" },
+      ],
+      powerPrimer: { name: "Hang Cleans / Med Ball Chest Pass", sets: 5, reps: "3", note: "Hang cleans 60–70% · alternate with chest pass" },
+      circuit: { note: "25 each total", exercises: ["Dips", "Pullups", "Walking Lunges"] },
       groups: [
-        { label: "Arm / Shoulder Tri-Set · 3 rounds", items: [
-            { name: "Rear Delt Fly",               reps: "15" },
-            { name: "Incline DB Curls",             reps: "12" },
-            { name: "Overhead Cable Triceps Ext.",  reps: "12" },
-        ]},
-        { label: "Shoulder Health", items: [
+        { label: "Shoulder", items: [
+            { name: "DB Lateral Raises",       sets: 3, reps: "15" },
             { name: "Band External Rotations", sets: 3, reps: "20" },
         ]},
       ],
@@ -397,16 +439,23 @@ const LIFT_PROGRAM = {
     5: { // Friday
       name: "Squat Day",
       mainLift: "Squat",
+      warmup: [
+        { name: "Hip 90/90 Switches", sets: 1, reps: "5 each side" },
+        { name: "Glute Bridges",      sets: 2, reps: "15" },
+        { name: "Goblet Squat",       sets: 2, reps: "8", note: "light KB/DB · hip opener" },
+      ],
       powerPrimer: { name: "Box Jumps", sets: 5, reps: "3", note: "Alt some weeks: Hill Sprints 6×8 sec" },
-      heavyComplement: { name: "Romanian Deadlift", sets: 5, reps: "5" },
-      circuit: { note: "50 each total", exercises: ["Air Squats", "Hanging Leg Raises", "Pullups"] },
+      circuit: { note: "50 each total", exercises: ["Pushups", "Inverted Rows", "Step Ups"] },
       groups: [
         { label: "Grappling Assistance", items: [
             { name: "Copenhagen Plank", sets: 3, reps: "20 sec each side" },
         ]},
-        { label: "Optional", items: [
-            { name: "Tibialis Raises", sets: 3, reps: "15" },
-        ]},
+      ],
+      runPrehab: [
+        { name: "Single-Leg Calf Raises",       sets: 2, reps: "15 each" },
+        { name: "Tibialis Raises",              sets: 3, reps: "15" },
+        { name: "Terminal Knee Extensions",     sets: 2, reps: "15 each" },
+        { name: "Lacrosse Ball Stands",          sets: 1, reps: "60 sec each" },
       ],
     },
   }
@@ -479,11 +528,15 @@ const STORAGE_KEY = "wt-v1";
 const DEFAULT_STATE = {
   settings: {
     programStartDate: getLastMonday(),
-    trainingMaxes: { "Squat": 225, "Bench Press": 155, "Deadlift": 275, "Overhead Press": 105 }
+    trainingMaxes: { "Squat": 225, "Bench Press": 155, "Deadlift": 275, "Overhead Press": 105 },
+    claudeApiKey: "",
   },
   liftLogs: [],
   runLogs:  [],
 };
+
+let chatMsgs = []; // [{role:'user'|'assistant', content:string}]
+let chatLoading = false;
 
 let S = loadState();
 
@@ -516,7 +569,7 @@ function getLastMonday(from) {
   d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
   return d.toISOString().split("T")[0];
 }
-function todayStr()        { return new Date().toISOString().split("T")[0]; }
+function todayStr()        { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function dayOfWeek(ds)     { return new Date(ds + "T12:00:00").getDay(); }
 function roundW(w)         { return Math.round(w / 5) * 5; }
 function e1rm(w, r)        { if (!w || !r || r <= 0) return 0; return r === 1 ? w : Math.round(w * (1 + r/30)); }
@@ -544,7 +597,7 @@ function totalWeeks() {
 
 
 function mainLiftSets(lift) {
-  const tm = S.settings.trainingMaxes[lift] || 0;
+  const tm = (S.settings.trainingMaxes[lift] || 0) * 0.9;
   return LIFT_PROGRAM.weekSchemes[weekInCycle()].sets.map(s => ({
     weight: roundW(tm * s.pct), reps: s.reps, pct: s.pct
   }));
@@ -790,7 +843,7 @@ function setToBeatHtml() {
   }
   if (!liftDay) return "";
   const wi=weekInCycle(), ws=LIFT_PROGRAM.weekSchemes[wi];
-  const lift=liftDay.mainLift, tm=S.settings.trainingMaxes[lift]||0;
+  const lift=liftDay.mainLift, tm=(S.settings.trainingMaxes[lift]||0)*0.9;
   const isDeload=wi===3;
   const sets=ws.sets.map(s=>({weight:roundW(tm*s.pct),reps:s.reps,pct:s.pct}));
   const lastLog=S.liftLogs.filter(l=>l.lift===lift).sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
@@ -809,7 +862,8 @@ function setToBeatHtml() {
 
 function liftPRCard(lift) {
   const logs=S.liftLogs.filter(l=>l.lift===lift).sort((a,b)=>b.date.localeCompare(a.date));
-  const tm=S.settings.trainingMaxes[lift]||0;
+  const rawMax=S.settings.trainingMaxes[lift]||0;
+  const tm=Math.round(rawMax*0.9);
   if (!logs.length) return `<div class="pr-card"><div class="pr-card-hdr"><div class="pr-lift">${lift}</div><div class="pr-tm">TM: ${tm} lbs</div></div><div class="pr-empty-msg">No sessions logged yet</div></div>`;
   const best=liftBest(lift);
   const sparkVals=liftE1rmHistory(lift,10).map(d=>d.y);
@@ -912,8 +966,8 @@ function modalsHtml() {
         <button class="close-btn" onclick="closeOv('ov-settings')">×</button>
       </div>
       <div class="settings-group">
-        <div class="settings-group-label">Training Maxes (lbs)</div>
-        ${MAIN_LIFTS.map(l => `<div class="field"><label>${l}</label><input type="number" id="tm-${eid(l)}" value="${S.settings.trainingMaxes[l]||""}" placeholder="Enter training max (85–90% of true 1RM)"></div>`).join("")}
+        <div class="settings-group-label">True 1RM (lbs) — working TM = 90%</div>
+        ${MAIN_LIFTS.map(l => `<div class="field"><label>${l}</label><input type="number" id="tm-${eid(l)}" value="${S.settings.trainingMaxes[l]||""}" placeholder="Enter true 1RM (working TM = 90%)"></div>`).join("")}
       </div>
       <div class="settings-group">
         <div class="settings-group-label">Program Start Date</div>
@@ -930,17 +984,214 @@ function modalsHtml() {
   </div>`;
 }
 
+// ═══════════════════════════════════════════════
+//  AI COACH
+// ═══════════════════════════════════════════════
+
+function buildSystemPrompt() {
+  const today = todayStr();
+  const wi = weekInCycle();
+  const ws = LIFT_PROGRAM.weekSchemes[wi];
+  const tms = S.settings.trainingMaxes;
+
+  // Summarise lift logs
+  const liftSummary = S.liftLogs.length === 0 ? "No lift sessions logged yet." :
+    [...S.liftLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,60).map(l => {
+      const top = l.sets[l.sets.length-1];
+      const e = top ? e1rm(top.weight, top.reps) : 0;
+      const setStr = l.sets.map(s=>`${s.weight}×${s.reps}`).join(', ');
+      return `${l.date} | ${l.lift} | sets: ${setStr}${e?' | e1RM: '+e+' lbs':''}${l.notes?' | notes: '+l.notes:''}`;
+    }).join('\n');
+
+  // Summarise run logs
+  const runSummary = S.runLogs.length === 0 ? "No runs logged yet." :
+    [...S.runLogs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,40).map(l => {
+      const pace = (l.distance>0&&l.duration>0) ? fmtPace(l.distance,l.duration) : '—';
+      return `${l.date} | ${l.type||'Run'} | ${l.distance} mi | ${fmtDur(l.duration)} | ${pace}/mi${l.notes?' | '+l.notes:''}`;
+    }).join('\n');
+
+  return `You are an expert strength and conditioning coach and running coach embedded in the user's personal workout tracker. You have full access to their training data and should give specific, data-driven advice.
+
+TODAY: ${today}
+CURRENT PROGRAM WEEK: Week ${wi+1} — ${ws.label} (5/3/1 cycle: 5s → 3s → 1s → Deload, repeat)
+
+TRAINING MAXES (85-90% of true 1RM):
+${MAIN_LIFTS.map(l=>`  ${l}: ${tms[l]||'not set'} lbs`).join('\n')}
+
+PROGRAM STRUCTURE (5/3/1):
+  Monday:    OHP Day   — Overhead Press main lift
+  Tuesday:   Deadlift Day — Deadlift main lift
+  Thursday:  Bench Day — Bench Press main lift
+  Friday:    Squat Day — Back Squat main lift
+  Upper day assistance: 25 each of Dips, Pullups, Walking Lunges
+  Lower day assistance: 50 each of Pushups, Inverted Rows, Back Raises
+  The athlete also trains BJJ and runs 3x/week (Long Run Sunday, Threshold Wednesday, Easy Thursday)
+
+LIFT LOG (most recent 60 sessions):
+${liftSummary}
+
+RUN LOG (most recent 40 sessions):
+${runSummary}
+
+GUIDELINES:
+- Be specific and reference actual numbers from their logs when relevant
+- For 5/3/1, progression is +5 lb/cycle on upper lifts (Bench, OHP) and +10 lb/cycle on lower lifts (Squat, Deadlift) after completing 4 weeks
+- e1RM = estimated 1-rep max using Epley formula: weight × (1 + reps/30)
+- Keep answers concise and actionable; use bullet points for lists
+- If data is sparse, say so and give general guidance
+- The athlete's goal context: improving strength (5/3/1) while maintaining BJJ and building running base toward a sub-30 5K`;
+}
+
+function chatHtml() {
+  const displayDate = new Date().toLocaleDateString("en-US",{weekday:"short",month:"long",day:"numeric"});
+  const hasKey = !!(S.settings.claudeApiKey);
+
+  const msgsHtml = chatMsgs.length === 0
+    ? `<div class="chat-empty">
+        <strong>🤖 AI Coach</strong>
+        Ask anything about your training — trends, PRs, program adjustments, recovery, pacing, or what to do today.
+      </div>`
+    : chatMsgs.map(m => `
+        <div class="chat-msg ${m.role}">
+          <div class="chat-role">${m.role === 'user' ? 'You' : 'Coach'}</div>
+          <div class="chat-bubble">${m.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        </div>`).join('');
+
+  const thinkingHtml = chatLoading
+    ? `<div class="chat-msg assistant"><div class="chat-role">Coach</div><div class="chat-thinking"><span></span><span></span><span></span></div></div>`
+    : '';
+
+  const suggestions = [
+    "How are my lifts trending?",
+    "Am I ready to increase my training maxes?",
+    "Analyze my running progress",
+    "What should I focus on this week?",
+    "How is my squat e1RM trending?",
+  ];
+  const suggestionsHtml = chatMsgs.length === 0
+    ? `<div class="chat-suggestion-row">${suggestions.map(s=>`<button class="chat-suggestion" onclick="useSuggestion(this.textContent)">${s}</button>`).join('')}</div>`
+    : '';
+
+  const noKeyHtml = !hasKey ? `
+    <div class="chat-nokey">
+      <h3>API Key Required</h3>
+      <p>To use the AI Coach, add your Claude API key in Settings.<br>Your key stays on your device and is only sent to Anthropic's API.</p>
+      <button class="btn btn-primary" onclick="openSettings()">⚙️ Open Settings</button>
+    </div>` : '';
+
+  return `
+  <nav class="page-nav">
+    <button class="pnav-a" onclick="goToday()">🏠 Today</button>
+    <span class="pnav-sep">/</span>
+    <button class="pnav-a" onclick="goProgress()">📈 Progress</button>
+    <span class="pnav-sep">/</span>
+    <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
+    <span class="pnav-sep">/</span>
+    <span class="pnav-a cur">🤖 Coach</span>
+  </nav>
+  <div class="hdr">
+    <div><h1>AI Coach</h1><div class="hdr-date">${displayDate}</div></div>
+    <div class="hdr-right">
+      ${chatMsgs.length > 0 ? `<button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="clearChat()">Clear</button>` : ''}
+      <button class="icon-btn" title="Settings" onclick="openSettings()">⚙️</button>
+    </div>
+  </div>
+  ${noKeyHtml}
+  ${hasKey ? `
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chat-messages">
+      ${msgsHtml}
+      ${thinkingHtml}
+    </div>
+    ${suggestionsHtml}
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="Ask about your training…" rows="1" onkeydown="chatKeydown(event)" oninput="autoResizeChat(this)"></textarea>
+      <button class="chat-send" id="chat-send-btn" onclick="sendChat()" ${chatLoading?'disabled':''}>Send</button>
+    </div>
+  </div>` : ''}
+  ${modalsHtml()}`;
+}
+
+function clearChat() { chatMsgs = []; render(); }
+
+function useSuggestion(text) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = text; input.focus(); }
+}
+
+function autoResizeChat(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+function scrollChatToBottom() {
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text || chatLoading) return;
+  if (!S.settings.claudeApiKey) { openSettings(); return; }
+
+  chatMsgs.push({ role: 'user', content: text });
+  chatLoading = true;
+  render();
+  scrollChatToBottom();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.settings.claudeApiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-allow-browser': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 1024,
+        system: buildSystemPrompt(),
+        messages: chatMsgs.map(m => ({ role: m.role, content: m.content })),
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:{message:res.statusText}}));
+      throw new Error(err?.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || '(no response)';
+    chatMsgs.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    chatMsgs.push({ role: 'assistant', content: `⚠️ Error: ${e.message}` });
+  }
+
+  chatLoading = false;
+  render();
+  scrollChatToBottom();
+}
+
 function progressHtml() {
   const displayDate=new Date().toLocaleDateString("en-US",{weekday:"short",month:"long",day:"numeric"});
   return `
   <nav class="page-nav">
-    <a class="pnav-a" style="cursor:pointer" data-view="today">🏠 Today</a>
+    <button class="pnav-a" onclick="goToday()">🏠 Today</button>
     <span class="pnav-sep">/</span>
-    <a class="pnav-a cur">📈 Progress</a>
+    <span class="pnav-a cur">📈 Progress</span>
     <span class="pnav-sep">/</span>
     <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
     <span class="pnav-sep">/</span>
     <a href="lifestyle.html" class="pnav-a">🌱 Lifestyle</a>
+    <span class="pnav-sep">/</span>
+    <button class="pnav-a" onclick="goChat()">🤖 Coach</button>
   </nav>
   <div class="hdr">
     <div><h1>Progress</h1><div class="hdr-date">${displayDate}</div></div>
@@ -954,12 +1205,9 @@ function progressHtml() {
   ${modalsHtml()}`;
 }
 
-function showView(v, tab) {
-  currentView = v;
-  if (tab !== undefined) progTab = tab;
-  window.scrollTo(0, 0);
-  render();
-}
+function goProgress() { currentView = 'progress'; progTab = 0; render(); document.getElementById('app').scrollTop=0; document.documentElement.scrollTop=0; }
+function goToday()    { currentView = 'today'; render(); document.getElementById('app').scrollTop=0; document.documentElement.scrollTop=0; }
+function goChat()     { currentView = 'chat'; render(); document.getElementById('app').scrollTop=0; document.documentElement.scrollTop=0; }
 
 function switchProgTab(i) {
   progTab = i;
@@ -979,18 +1227,14 @@ let progTab     = 0;         // 0=Lifts  1=Running  (progress sub-tab)
 
 function render() {
   try {
-    document.getElementById("app").innerHTML = currentView === 'progress' ? progressHtml() : html();
+    let content;
+    if (currentView === 'progress') content = progressHtml();
+    else if (currentView === 'chat')  content = chatHtml();
+    else                              content = html();
+    document.getElementById("app").innerHTML = content;
   } catch(e) {
     document.getElementById("app").innerHTML = `<div style="color:#ef4444;padding:20px;font-family:monospace;font-size:13px"><strong>Render error:</strong><br>${e.message}<br><pre>${e.stack}</pre></div>`;
-    return;
   }
-  // Attach nav switches via event listener (more reliable than onclick in innerHTML)
-  document.querySelectorAll('[data-view]').forEach(el => {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-      showView(el.dataset.view, el.dataset.tab !== undefined ? parseInt(el.dataset.tab) : undefined);
-    });
-  });
 }
 
 function html() {
@@ -1005,13 +1249,15 @@ function html() {
 
   return `
   <nav class="page-nav">
-    <a class="pnav-a cur">🏠 Today</a>
+    <span class="pnav-a cur">🏠 Today</span>
     <span class="pnav-sep">/</span>
-    <a class="pnav-a" style="cursor:pointer" data-view="progress">📈 Progress</a>
+    <button class="pnav-a" onclick="goProgress()">📈 Progress</button>
     <span class="pnav-sep">/</span>
     <a href="metrics.html" class="pnav-a">⚖️ Metrics</a>
     <span class="pnav-sep">/</span>
     <a href="lifestyle.html" class="pnav-a">🌱 Lifestyle</a>
+    <span class="pnav-sep">/</span>
+    <button class="pnav-a" onclick="goChat()">🤖 Coach</button>
   </nav>
 
   <div class="hdr">
@@ -1141,11 +1387,11 @@ function html() {
         <button class="close-btn" onclick="closeOv('ov-settings')">×</button>
       </div>
       <div class="settings-group">
-        <div class="settings-group-label">Training Maxes (lbs)</div>
+        <div class="settings-group-label">True 1RM (lbs) — working TM = 90%</div>
         ${MAIN_LIFTS.map(l => `
           <div class="field">
             <label>${l}</label>
-            <input type="number" id="tm-${eid(l)}" value="${S.settings.trainingMaxes[l]||""}" placeholder="Enter training max (85–90% of true 1RM)">
+            <input type="number" id="tm-${eid(l)}" value="${S.settings.trainingMaxes[l]||""}" placeholder="Enter true 1RM (working TM = 90%)">
           </div>`).join("")}
       </div>
       <div class="settings-group">
@@ -1156,6 +1402,14 @@ function html() {
       </div>
       <div class="prog-note-banner">
         <strong>Progression:</strong> After each 4-week cycle, add <strong>+5 lb</strong> to upper lift TMs (Bench, OHP) and <strong>+10 lb</strong> to lower lift TMs (Squat, Deadlift). Keep PR sets at ~1–2 reps in reserve.
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-label">AI Coach</div>
+        <div class="field">
+          <label>Claude API Key</label>
+          <input type="password" id="claude-api-key" value="${S.settings.claudeApiKey||''}" placeholder="sk-ant-…" autocomplete="off">
+        </div>
+        <div class="api-key-note">Stored locally only — sent exclusively to api.anthropic.com. Get a key at console.anthropic.com.</div>
       </div>
       <div class="modal-ftr">
         <button class="btn btn-ghost" onclick="closeOv('ov-settings')">Cancel</button>
@@ -1239,6 +1493,11 @@ function liftCard(w) {
     </div>
 
     <div class="prog-block">
+      <div class="prog-block-label">Warmup</div>
+      ${w.warmup.map(e => `<div class="prog-acc"><span>${e.name}</span><span class="prog-acc-detail">${e.sets}×${e.reps}</span></div>${e.note?`<div class="prog-note">${e.note}</div>`:""}`).join("")}
+    </div>
+
+    <div class="prog-block">
       <div class="prog-block-label">Power Primer</div>
       <div class="prog-single">
         <span>${w.powerPrimer.name}</span>
@@ -1258,19 +1517,16 @@ function liftCard(w) {
     </div>
 
     <div class="prog-block">
-      <div class="prog-block-label">Heavy Complement</div>
-      <div class="prog-single">
-        <span>${w.heavyComplement.name}</span>
-        <span class="prog-single-detail">${w.heavyComplement.sets}×${w.heavyComplement.reps}</span>
-      </div>
-    </div>
-
-    <div class="prog-block">
       <div class="prog-block-label">Bodyweight Circuit <span>${w.circuit.note}</span></div>
       <div class="prog-circuit">${w.circuit.exercises.join(" · ")}</div>
     </div>
 
     ${groupsHtml}
+
+    ${w.runPrehab ? `<div class="prog-block">
+      <div class="prog-block-label">Running Prehab</div>
+      ${w.runPrehab.map(e => `<div class="prog-acc"><span>${e.name}</span><span class="prog-acc-detail">${e.sets}×${e.reps}</span></div>`).join("")}
+    </div>` : ""}
 
     <div class="prog-block">
       <div class="prog-block-label">Finisher</div>
@@ -1380,7 +1636,7 @@ function runHist() {
       </td>
     </tr>`).join("");
   return `<table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th><th></th></tr></thead><tbody>${rows}</tbody></table>
-  <div style="margin-top:10px;text-align:right"><a style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;cursor:pointer" data-view="progress" data-tab="1">📈 View Running Progress →</a></div>`;
+  <div style="margin-top:10px;text-align:right"><a style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;cursor:pointer" href="#progress-running">📈 View Running Progress →</a></div>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -1471,7 +1727,7 @@ function refreshSetRows() {
   if (!isCustom) {
     const wi = weekInCycleForDate(date);
     const ws = LIFT_PROGRAM.weekSchemes[wi];
-    const tm = S.settings.trainingMaxes[lift] || 0;
+    const tm = (S.settings.trainingMaxes[lift] || 0) * 0.9;
     const isDeload = wi === 3;
     lgSets = ws.sets.map((s, i) => ({
       weight:  roundW(tm * s.pct),
@@ -1600,7 +1856,7 @@ function logFromDay(mode) {
 }
 
 function setsForWeek(lift, weekIdx) {
-  const tm = S.settings.trainingMaxes[lift] || 0;
+  const tm = (S.settings.trainingMaxes[lift] || 0) * 0.9;
   return LIFT_PROGRAM.weekSchemes[weekIdx].sets.map(s => ({
     weight: roundW(tm * s.pct), reps: s.reps, pct: s.pct
   }));
@@ -1648,6 +1904,10 @@ function viewDay(ds) {
 
     body += `
       <div class="day-section">
+        <div class="day-section-lbl">Warmup</div>
+        ${liftW.warmup.map(e => `<div class="day-acc"><span>${e.name}</span><span class="day-acc-d">${e.sets}×${e.reps}</span></div>${e.note?`<div class="day-note">${e.note}</div>`:""}`).join("")}
+      </div>
+      <div class="day-section">
         <div class="day-section-lbl">Power Primer</div>
         <div class="day-single"><span>${liftW.powerPrimer.name}</span><span class="day-single-detail">${liftW.powerPrimer.sets}×${liftW.powerPrimer.reps}</span></div>
         ${liftW.powerPrimer.note ? `<div class="day-note">${liftW.powerPrimer.note}</div>` : ""}
@@ -1657,14 +1917,14 @@ function viewDay(ds) {
         <div class="sets-wrap">${setsRows}</div>
       </div>
       <div class="day-section">
-        <div class="day-section-lbl">Heavy Complement</div>
-        <div class="day-single"><span>${liftW.heavyComplement.name}</span><span class="day-single-detail">${liftW.heavyComplement.sets}×${liftW.heavyComplement.reps}</span></div>
-      </div>
-      <div class="day-section">
         <div class="day-section-lbl">Bodyweight Circuit <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">${liftW.circuit.note}</span></div>
         <div class="day-circuit">${liftW.circuit.exercises.join(" · ")}</div>
       </div>
-      ${groupsHtml}`;
+      ${groupsHtml}
+      ${liftW.runPrehab ? `<div class="day-section">
+        <div class="day-section-lbl">Running Prehab</div>
+        ${liftW.runPrehab.map(e => `<div class="day-acc"><span>${e.name}</span><span class="day-acc-d">${e.sets}×${e.reps}</span></div>`).join("")}
+      </div>` : ""}`;
   } else {
     body += `<div class="day-section"><div class="day-rest">No lifting scheduled.</div></div>`;
   }
@@ -1691,6 +1951,8 @@ function saveSettings() {
   });
   const d = document.getElementById("prog-start").value;
   if (d) S.settings.programStartDate = d;
+  const k = document.getElementById("claude-api-key");
+  if (k) S.settings.claudeApiKey = k.value.trim();
   saveState(); closeOv("ov-settings"); render();
 }
 
@@ -1700,14 +1962,13 @@ document.addEventListener("click", e => {
 });
 
 // ═══════════════════════════════════════════════
-//  BOOT
+//  HASH ROUTER
 // ═══════════════════════════════════════════════
-(function() {
-  const p = new URLSearchParams(window.location.search);
-  if (p.get('view') === 'progress') currentView = 'progress';
-  const tab = p.get('tab');
-  if (tab !== null) progTab = parseInt(tab);
-})();
+const _startHash = window.location.hash;
+history.replaceState(null, '', location.pathname);
+if (_startHash === '#progress') { currentView = 'progress'; progTab = 0; }
+else if (_startHash === '#progress-running') { currentView = 'progress'; progTab = 1; }
+else { currentView = 'today'; }
 render();
 </script>
 </body>
