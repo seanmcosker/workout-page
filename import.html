@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apple Health Import — Workout Tracker</title>
+  <title>Import — Workout Tracker</title>
   <style>
     :root {
       --bg: #0d0d14; --surface: #13131e; --surface2: #1b1b2e; --border: #24243c;
       --accent: #7c3aed; --accent-h: #6d28d9; --green: #10b981; --green-h: #059669;
       --text: #e2e8f0; --dim: #94a3b8; --muted: #4a5570;
       --yellow: #f59e0b; --red: #ef4444; --r: 12px;
+      --mf: #e85d26;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; min-height: 100vh; font-size: 14px; line-height: 1.5; }
     #app { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
 
-    .page-nav { display: flex; align-items: center; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .page-nav { display: flex; align-items: center; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; flex-wrap: wrap; }
     .pnav-a { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); text-decoration: none; transition: all .15s; }
     .pnav-a:hover { background: var(--surface2); color: var(--text); }
     .pnav-a.cur { background: var(--surface2); color: var(--accent); }
@@ -25,18 +26,28 @@
     .hdr-title { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
     .hdr-sub { font-size: 14px; color: var(--dim); margin-top: 4px; }
 
+    /* Source tabs */
+    .source-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .src-tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; transition: all .15s; font-size: 14px; font-weight: 600; color: var(--dim); }
+    .src-tab:hover { border-color: var(--muted); color: var(--text); }
+    .src-tab.active { color: #fff; border-color: transparent; }
+    .src-tab.active.ah { background: linear-gradient(135deg,#e53935,#ff5252); border-color: transparent; }
+    .src-tab.active.mf { background: linear-gradient(135deg,#e85d26,#f59e0b); border-color: transparent; }
+    .src-icon { font-size: 22px; }
+    @media (max-width: 480px) { .source-tabs { flex-direction: column; } }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 16px; }
     .card-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px; }
 
-    /* Steps */
     .steps { display: flex; flex-direction: column; gap: 10px; }
     .step { display: flex; gap: 12px; align-items: flex-start; }
     .step-num { flex-shrink: 0; width: 24px; height: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); }
     .step-text { font-size: 13px; color: var(--dim); line-height: 1.5; }
     .step-text strong { color: var(--text); }
-    .step-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-    /* Drop zone */
     .drop-zone { border: 2px dashed var(--border); border-radius: var(--r); padding: 40px 24px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(124,58,237,.05); }
     .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -44,7 +55,6 @@
     .drop-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
     .drop-sub { font-size: 12px; color: var(--muted); }
 
-    /* Loading */
     .loading-wrap { text-align: center; padding: 32px; }
     .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -53,7 +63,6 @@
     .progress-bar-wrap { background: var(--surface2); border-radius: 8px; height: 4px; margin: 16px auto 0; max-width: 200px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 8px; transition: width .3s; }
 
-    /* Preview */
     .found-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
     @media (max-width: 500px) { .found-grid { grid-template-columns: 1fr; } }
     .found-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
@@ -63,28 +72,19 @@
     .found-skip { font-size: 11px; color: var(--yellow); margin-top: 2px; }
     .found-none { opacity: .4; }
 
-    /* Import options */
     .opt-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
     .opt-row:last-child { border-bottom: none; }
     .opt-check { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
     .opt-label { font-size: 13px; color: var(--text); flex: 1; }
     .opt-count { font-size: 12px; color: var(--muted); }
 
-    /* Run type selector */
-    .run-type-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
-    .run-type-row label { font-size: 13px; color: var(--dim); }
-    .run-type-row select { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; color: var(--text); font-size: 13px; }
-
-    /* Buttons */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: var(--accent-h); }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
     .btn-ghost { background: transparent; color: var(--dim); border: 1px solid var(--border); }
     .btn-ghost:hover { background: var(--surface2); }
     .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
-    /* Success */
     .success-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
     .success-title { font-size: 18px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 8px; }
     .result-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--border); }
@@ -92,9 +92,18 @@
     .result-dot { color: var(--green); font-weight: 700; font-size: 16px; }
     .success-links { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
 
-    /* Warning */
     .warn-banner { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #fcd34d; line-height: 1.5; margin-bottom: 12px; }
     .sec-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 10px; }
+
+    /* MacroFactor preview table */
+    .mf-preview { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+    .mf-preview-row { display: grid; grid-template-columns: 90px repeat(auto-fill, minmax(80px, 1fr)); gap: 0; border-bottom: 1px solid var(--border); }
+    .mf-preview-row:last-child { border-bottom: none; }
+    .mf-preview-row.hdr-row { background: var(--surface2); }
+    .mf-cell { padding: 7px 10px; font-size: 12px; color: var(--dim); }
+    .mf-cell.head { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    .mf-cell.val { font-weight: 600; color: var(--text); }
+    .mf-cell.date { color: var(--dim); }
   </style>
 </head>
 <body>
@@ -108,388 +117,521 @@
     <span class="pnav-sep">/</span>
     <a href="lifestyle.html" class="pnav-a">🌱 Lifestyle</a>
     <span class="pnav-sep">/</span>
-    <a href="import.html" class="pnav-a cur">🍎 Import</a>
+    <a href="import.html" class="pnav-a cur">⬆ Import</a>
   </nav>
 
   <div class="hdr">
-    <div class="hdr-title">🍎 Apple Health Import</div>
-    <div class="hdr-sub">Pull your runs, resting heart rate, HRV, weight, and body fat directly from your Health export</div>
+    <div class="hdr-title">⬆ Import</div>
+    <div class="hdr-sub">Pull data from Apple Health or MacroFactor — everything stays on your device</div>
   </div>
 
-  <!-- Instructions -->
-  <div class="card" id="instructions">
-    <div class="card-title">How to export from Apple Health</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Open the <strong>Health app</strong> on your iPhone → tap your <strong>profile photo</strong> (top right)</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Scroll down → tap <strong>Export All Health Data</strong> → confirm → share/save the <strong>.zip</strong> to your Mac</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text"><strong>Unzip</strong> the file — you'll find <strong>export.xml</strong> inside the apple_health_export folder</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-text">Select <strong>export.xml</strong> below — everything stays local, nothing is uploaded</div>
-      </div>
+  <!-- Source picker -->
+  <div class="source-tabs">
+    <div class="src-tab ah active" onclick="setSource('ah')">
+      <span class="src-icon">🍎</span>
+      <span>Apple Health</span>
+    </div>
+    <div class="src-tab mf" onclick="setSource('mf')">
+      <span class="src-icon">🟠</span>
+      <span>MacroFactor</span>
     </div>
   </div>
 
-  <!-- Drop zone -->
-  <div class="card" id="drop-card">
-    <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept=".xml" onchange="onFileSelected(event)">
-      <div class="drop-icon">📂</div>
-      <div class="drop-title">Drop export.xml here</div>
-      <div class="drop-sub">or click to browse — file stays on your device</div>
+  <!-- ── Apple Health ── -->
+  <div class="section active" id="sec-ah">
+    <div class="card">
+      <div class="card-title">How to export from Apple Health</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Open the <strong>Health app</strong> on your iPhone → tap your <strong>profile photo</strong> (top right)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Scroll down → tap <strong>Export All Health Data</strong> → confirm → share/save the <strong>.zip</strong> to your Mac</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Unzip</strong> the file — you'll find <strong>export.xml</strong> inside the apple_health_export folder</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">Select <strong>export.xml</strong> below — everything stays local, nothing is uploaded</div>
+        </div>
+      </div>
     </div>
+
+    <div class="card" id="ah-drop-card">
+      <div class="drop-zone" id="ah-drop-zone">
+        <input type="file" id="ah-file-input" accept=".xml" onchange="ahOnFileSelected(event)">
+        <div class="drop-icon">📂</div>
+        <div class="drop-title">Drop export.xml here</div>
+        <div class="drop-sub">or click to browse — file stays on your device</div>
+      </div>
+    </div>
+
+    <div id="ah-state-area"></div>
   </div>
 
-  <!-- States rendered by JS -->
-  <div id="state-area"></div>
+  <!-- ── MacroFactor ── -->
+  <div class="section" id="sec-mf">
+    <div class="card">
+      <div class="card-title">How to export from MacroFactor</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Open MacroFactor → tap <strong>More</strong> (bottom right) → <strong>Export Your Data</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Select <strong>Spreadsheet export</strong> — choose the date range you want</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Save the <strong>.csv</strong> file to your Mac (it may come as a .xlsx — export as CSV from Numbers or Excel)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">Drop it below — weight and nutrition data will sync to your Lifestyle tracker</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="mf-drop-card">
+      <div class="drop-zone" id="mf-drop-zone">
+        <input type="file" id="mf-file-input" accept=".csv,.tsv,.txt" onchange="mfOnFileSelected(event)">
+        <div class="drop-icon">📂</div>
+        <div class="drop-title">Drop MacroFactor CSV here</div>
+        <div class="drop-sub">or click to browse — file stays on your device</div>
+      </div>
+    </div>
+
+    <div id="mf-state-area"></div>
+  </div>
+
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-//  STATE (shared localStorage with all pages)
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════════
 
-const STORAGE_KEY = "wt-v1";
-function loadState() {
-  try { const r=localStorage.getItem(STORAGE_KEY); if(r){ const p=JSON.parse(r); return p; } } catch(e){}
-  return { settings:{}, liftLogs:[], runLogs:[], bodyLogs:[] };
-}
-function saveState(S) { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); }
+const WT_KEY = 'wt-v1';
+const LS_KEY = 'lifestyle_logs_v1';
 
-function pad(n) { return String(n).padStart(2,"0"); }
-function uid()  { return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function loadWT()  { try { const r = localStorage.getItem(WT_KEY);  if (r) return JSON.parse(r); } catch(e){} return { settings:{}, liftLogs:[], runLogs:[], bodyLogs:[] }; }
+function saveWT(S) { localStorage.setItem(WT_KEY, JSON.stringify(S)); }
+function loadLS()  { try { const r = localStorage.getItem(LS_KEY);  if (r) return JSON.parse(r); } catch(e){} return {}; }
+function saveLS(d) { localStorage.setItem(LS_KEY, JSON.stringify(d)); }
+
+function pad(n) { return String(n).padStart(2,'0'); }
+function uid()  { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
 function fmtDur(s) { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return h?`${h}:${pad(m)}:${pad(ss)}`:`${m}:${pad(ss)}`; }
 
-// ═══════════════════════════════════════════════
-//  DRAG & DROP
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  SOURCE TAB
+// ══════════════════════════════════════════════════
 
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
-});
-
-function onFileSelected(e) {
-  const file = e.target.files[0];
-  if (file) processFile(file);
+function setSource(src) {
+  document.querySelectorAll('.src-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.src-tab.${src}`).classList.add('active');
+  document.getElementById(`sec-${src}`).classList.add('active');
 }
 
-// ═══════════════════════════════════════════════
-//  FILE PROCESSING
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  APPLE HEALTH
+// ══════════════════════════════════════════════════
 
-let parsed = null;
+const ahDz = document.getElementById('ah-drop-zone');
+ahDz.addEventListener('dragover',  e => { e.preventDefault(); ahDz.classList.add('dragover'); });
+ahDz.addEventListener('dragleave', () => ahDz.classList.remove('dragover'));
+ahDz.addEventListener('drop', e => { e.preventDefault(); ahDz.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f) ahProcessFile(f); });
+function ahOnFileSelected(e) { const f = e.target.files[0]; if (f) ahProcessFile(f); }
 
-function processFile(file) {
-  document.getElementById('state-area').innerHTML = `
+let ahParsed = null;
+
+function ahProcessFile(file) {
+  document.getElementById('ah-state-area').innerHTML = `
     <div class="card">
       <div class="loading-wrap">
         <div class="spinner"></div>
         <div class="loading-title">Parsing ${file.name}…</div>
         <div class="loading-sub">Large exports can take 10–30 seconds</div>
-        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog" style="width:5%"></div></div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="ah-prog" style="width:5%"></div></div>
       </div>
     </div>`;
-
   const reader = new FileReader();
-  reader.onprogress = e => {
-    if (e.lengthComputable) {
-      const pct = Math.round((e.loaded / e.total) * 60) + 5;
-      const p = document.getElementById('prog');
-      if (p) p.style.width = pct + '%';
-    }
-  };
+  reader.onprogress = e => { if (e.lengthComputable) { const p = document.getElementById('ah-prog'); if (p) p.style.width = (Math.round((e.loaded/e.total)*60)+5)+'%'; }};
   reader.onload = e => {
-    const p = document.getElementById('prog');
-    if (p) p.style.width = '75%';
-    // yield to browser to update UI
+    const p = document.getElementById('ah-prog'); if (p) p.style.width = '75%';
     setTimeout(() => {
-      try {
-        parsed = parseHealthXML(e.target.result);
-        const p2 = document.getElementById('prog');
-        if (p2) p2.style.width = '100%';
-        setTimeout(() => showPreview(), 200);
-      } catch(err) {
-        document.getElementById('state-area').innerHTML =
-          `<div class="card"><div style="color:var(--red);padding:16px">Error parsing file: ${err.message}</div></div>`;
-      }
+      try { ahParsed = parseHealthXML(e.target.result); const p2 = document.getElementById('ah-prog'); if (p2) p2.style.width = '100%'; setTimeout(ahShowPreview, 200); }
+      catch(err) { document.getElementById('ah-state-area').innerHTML = `<div class="card"><div style="color:var(--red);padding:16px">Error: ${err.message}</div></div>`; }
     }, 50);
   };
-  reader.onerror = () => {
-    document.getElementById('state-area').innerHTML =
-      `<div class="card"><div style="color:var(--red);padding:16px">Failed to read file.</div></div>`;
-  };
+  reader.onerror = () => { document.getElementById('ah-state-area').innerHTML = `<div class="card"><div style="color:var(--red);padding:16px">Failed to read file.</div></div>`; };
   reader.readAsText(file);
 }
 
-// ═══════════════════════════════════════════════
-//  PARSER  (regex-based, fast for large files)
-// ═══════════════════════════════════════════════
-
 function parseHealthXML(text) {
-  const S = loadState();
-  const existingRunDates = new Set(S.runLogs.map(l => l.date));
+  const S = loadWT();
+  const existingRunDates  = new Set(S.runLogs.map(l => l.date));
   const existingBodyDates = new Set((S.bodyLogs||[]).map(l => l.date));
+  const result = { runs:[], rhr:new Map(), hrv:new Map(), weight:new Map(), bodyFat:new Map() };
 
-  const result = {
-    runs:    [],
-    rhr:     new Map(),  // date → value
-    hrv:     new Map(),  // date → [values]
-    weight:  new Map(),  // date → value
-    bodyFat: new Map(),  // date → value
-  };
-
-  // ── Running workouts ──
   const wRe = /<Workout\s[^>]*workoutActivityType="HKWorkoutActivityTypeRunning"[^>]*>([\s\S]*?)<\/Workout>/g;
   let m;
   while ((m = wRe.exec(text)) !== null) {
-    const outer = m[0], inner = m[1];
-    const startDate = (outer.match(/\bstartDate="([^"]+)"/) || [])[1];
-    const dur       = parseFloat((outer.match(/\bduration="([^"]+)"/) || [])[1]);
-    const dist      = parseFloat((outer.match(/\btotalDistance="([^"]+)"/) || [])[1]);
-    const distUnit  = (outer.match(/\btotalDistanceUnit="([^"]+)"/) || [])[1];
-    const hrAvgM    = inner.match(/type="HKQuantityTypeIdentifierHeartRate"[^>]*average="([^"]+)"/);
-    const avgHR     = hrAvgM ? parseFloat(hrAvgM[1]) : null;
-
+    const outer=m[0], inner=m[1];
+    const startDate=(outer.match(/\bstartDate="([^"]+)"/)  ||[])[1];
+    const dur      = parseFloat((outer.match(/\bduration="([^"]+)"/)       ||[])[1]);
+    const dist     = parseFloat((outer.match(/\btotalDistance="([^"]+)"/)  ||[])[1]);
+    const distUnit =(outer.match(/\btotalDistanceUnit="([^"]+)"/)           ||[])[1];
+    const hrAvgM   = inner.match(/type="HKQuantityTypeIdentifierHeartRate"[^>]*average="([^"]+)"/);
+    const avgHR    = hrAvgM ? parseFloat(hrAvgM[1]) : null;
     if (!startDate || isNaN(dur) || isNaN(dist) || dist <= 0) continue;
-
-    const date      = startDate.split(' ')[0];
-    const distMi    = distUnit === 'km' ? dist * 0.621371 : dist;
-    const durSecs   = Math.round(dur * 60);
-
-    // Smart type guess
-    let type = 'Easy Run';
-    if (dur > 55) type = 'Long Run';
-    else if (avgHR && avgHR > 153) type = 'Threshold';
-
-    result.runs.push({
-      date,
-      distance: Math.round(distMi * 100) / 100,
-      duration: durSecs,
-      type,
-      avgHR,
-      isNew: !existingRunDates.has(date),
-    });
+    const date=startDate.split(' ')[0], distMi=distUnit==='km'?dist*0.621371:dist;
+    let type='Easy Run';
+    if (dur>55) type='Long Run'; else if (avgHR&&avgHR>153) type='Threshold';
+    result.runs.push({ date, distance:Math.round(distMi*100)/100, duration:Math.round(dur*60), type, avgHR, isNew:!existingRunDates.has(date) });
   }
 
-  // ── Health records ──
-  // Self-closing records: <Record ... />
-  // Also records with children: <Record ...>...</Record>
   const rRe = /<Record\b([^>]*?)(?:\/?>)/g;
   while ((m = rRe.exec(text)) !== null) {
-    const attrs = m[1];
-    const getA  = key => { const r = new RegExp(`\\b${key}="([^"]+)"`); return (attrs.match(r)||[])[1]; };
-    const type  = getA('type');
-    const val   = parseFloat(getA('value'));
-    const date  = (getA('startDate')||'').split(' ')[0];
-    const unit  = getA('unit');
-
-    if (!type || !date || isNaN(val)) continue;
-
-    switch (type) {
-      case 'HKQuantityTypeIdentifierRestingHeartRate':
-        if (!result.rhr.has(date) || val < result.rhr.get(date))
-          result.rhr.set(date, Math.round(val));
-        break;
-      case 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN':
-        if (!result.hrv.has(date)) result.hrv.set(date, []);
-        result.hrv.get(date).push(val);
-        break;
-      case 'HKQuantityTypeIdentifierBodyMass': {
-        const lbs = unit === 'kg' ? val * 2.20462 : val;
-        if (!result.weight.has(date)) result.weight.set(date, Math.round(lbs * 10) / 10);
-        break;
-      }
-      case 'HKQuantityTypeIdentifierBodyFatPercentage':
-        // Apple stores as % (e.g. 18.5)
-        if (!result.bodyFat.has(date)) result.bodyFat.set(date, Math.round(val * 10) / 10);
-        break;
+    const attrs=m[1], getA=key=>{const r=new RegExp(`\\b${key}="([^"]+)"`);return(attrs.match(r)||[])[1];};
+    const type=getA('type'), val=parseFloat(getA('value')), date=(getA('startDate')||'').split(' ')[0], unit=getA('unit');
+    if (!type||!date||isNaN(val)) continue;
+    switch(type) {
+      case 'HKQuantityTypeIdentifierRestingHeartRate': if(!result.rhr.has(date)||val<result.rhr.get(date)) result.rhr.set(date,Math.round(val)); break;
+      case 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN': if(!result.hrv.has(date)) result.hrv.set(date,[]); result.hrv.get(date).push(val); break;
+      case 'HKQuantityTypeIdentifierBodyMass': { const lbs=unit==='kg'?val*2.20462:val; if(!result.weight.has(date)) result.weight.set(date,Math.round(lbs*10)/10); break; }
+      case 'HKQuantityTypeIdentifierBodyFatPercentage': if(!result.bodyFat.has(date)) result.bodyFat.set(date,Math.round(val*10)/10); break;
     }
   }
-
-  // Average HRV per day
-  result.hrv.forEach((vals, date) => {
-    result.hrv.set(date, Math.round(vals.reduce((a,b)=>a+b,0)/vals.length));
-  });
-
-  // Mark body metric dates as new/existing
-  result.rhrNew     = [...result.rhr.keys()].filter(d => !existingBodyDates.has(d)).length;
-  result.hrvNew     = [...result.hrv.keys()].filter(d => !existingBodyDates.has(d)).length;
-  result.weightNew  = [...result.weight.keys()].filter(d => !existingBodyDates.has(d)).length;
-  result.bodyFatNew = [...result.bodyFat.keys()].filter(d => !existingBodyDates.has(d)).length;
-
+  result.hrv.forEach((vals,date)=>result.hrv.set(date,Math.round(vals.reduce((a,b)=>a+b,0)/vals.length)));
+  result.rhrNew=result.rhr.size; result.hrvNew=result.hrv.size; result.weightNew=result.weight.size; result.bodyFatNew=result.bodyFat.size;
   return result;
 }
 
-// ═══════════════════════════════════════════════
-//  PREVIEW
-// ═══════════════════════════════════════════════
-
-function showPreview() {
-  const p = parsed;
-  const runsNew  = p.runs.filter(r => r.isNew).length;
-  const runsSkip = p.runs.length - runsNew;
-
-  function foundItem(icon, count, label, skipCount=0, newCount=null) {
-    const nc = newCount ?? count;
-    const isEmpty = count === 0;
-    return `<div class="found-item${isEmpty?' found-none':''}">
+function ahShowPreview() {
+  const p=ahParsed, runsNew=p.runs.filter(r=>r.isNew).length, runsSkip=p.runs.length-runsNew;
+  function fi(icon,count,label,skipCount=0) {
+    return `<div class="found-item${count===0?' found-none':''}">
       <div class="found-icon">${icon}</div>
-      <div>
-        <div class="found-count">${count.toLocaleString()}</div>
-        <div class="found-label">${label}</div>
-        ${skipCount > 0 ? `<div class="found-skip">${skipCount} already logged → will skip</div>` : ''}
-      </div>
-    </div>`;
+      <div><div class="found-count">${count.toLocaleString()}</div><div class="found-label">${label}</div>
+      ${skipCount>0?`<div class="found-skip">${skipCount} already logged → skip</div>`:''}</div></div>`;
   }
-
-  const hasRuns   = p.runs.length > 0;
-  const hasRHR    = p.rhr.size > 0;
-  const hasHRV    = p.hrv.size > 0;
-  const hasWeight = p.weight.size > 0;
-  const hasBF     = p.bodyFat.size > 0;
-  const hasBody   = hasRHR || hasHRV || hasWeight || hasBF;
-
-  if (!hasRuns && !hasBody) {
-    document.getElementById('state-area').innerHTML = `
-      <div class="card" style="text-align:center;padding:32px;color:var(--muted)">
-        No running workouts or health metrics found.<br>
-        <span style="font-size:12px">Make sure you selected the correct export.xml file.</span>
-      </div>`;
+  const hasRuns=p.runs.length>0, hasBody=p.rhr.size>0||p.hrv.size>0||p.weight.size>0||p.bodyFat.size>0;
+  if (!hasRuns&&!hasBody) {
+    document.getElementById('ah-state-area').innerHTML=`<div class="card" style="text-align:center;padding:32px;color:var(--muted)">No running workouts or health metrics found. Make sure you selected export.xml.</div>`;
     return;
   }
-
-  document.getElementById('state-area').innerHTML = `
+  document.getElementById('ah-state-area').innerHTML=`
   <div class="card">
     <div class="sec-label">Found in export</div>
     <div class="found-grid">
-      ${foundItem('🏃', p.runs.length, 'Running workouts', runsSkip)}
-      ${foundItem('❤️', p.rhr.size, 'Days of resting HR')}
-      ${foundItem('💙', p.hrv.size, 'Days of HRV')}
-      ${foundItem('⚖️', p.weight.size, 'Weight entries')}
-      ${foundItem('📊', p.bodyFat.size, 'Body fat entries')}
+      ${fi('🏃',p.runs.length,'Running workouts',runsSkip)}
+      ${fi('❤️',p.rhr.size,'Days of resting HR')}
+      ${fi('💙',p.hrv.size,'Days of HRV')}
+      ${fi('⚖️',p.weight.size,'Weight entries')}
+      ${fi('📊',p.bodyFat.size,'Body fat entries')}
     </div>
-
     <div class="sec-label">Import options</div>
     <div>
-      ${hasRuns ? `<div class="opt-row">
-        <input type="checkbox" class="opt-check" id="opt-runs" checked>
-        <label class="opt-label" for="opt-runs">Running workouts</label>
-        <span class="opt-count">${runsNew} new${runsSkip ? `, ${runsSkip} skipped` : ''}</span>
-      </div>` : ''}
-      ${hasBody ? `<div class="opt-row">
-        <input type="checkbox" class="opt-check" id="opt-body" checked>
-        <label class="opt-label" for="opt-body">Body metrics (RHR, HRV, weight, body fat)</label>
-        <span class="opt-count">${Math.max(p.rhr.size, p.hrv.size, p.weight.size, p.bodyFat.size)} days</span>
-      </div>` : ''}
+      ${hasRuns?`<div class="opt-row"><input type="checkbox" class="opt-check" id="ah-opt-runs" checked><label class="opt-label" for="ah-opt-runs">Running workouts</label><span class="opt-count">${runsNew} new${runsSkip?`, ${runsSkip} skipped`:''}</span></div>`:''}
+      ${hasBody?`<div class="opt-row"><input type="checkbox" class="opt-check" id="ah-opt-body" checked><label class="opt-label" for="ah-opt-body">Body metrics (RHR, HRV, weight, body fat)</label><span class="opt-count">${Math.max(p.rhr.size,p.hrv.size,p.weight.size,p.bodyFat.size)} days</span></div>`:''}
     </div>
-
-    ${hasRuns ? `
-    <div style="margin-top:12px">
-      <div class="sec-label">Run type — when Apple Health data can't determine type</div>
-      <div class="warn-banner">
-        Runs are auto-classified based on duration &amp; heart rate. You can change individual runs after import in the History tab.
-      </div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.8">
-        &gt; 55 min → <strong style="color:#a78bfa">Long Run</strong> &nbsp;·&nbsp;
-        HR &gt; 153 → <strong style="color:#fbbf24">Threshold</strong> &nbsp;·&nbsp;
-        everything else → <strong style="color:#34d399">Easy Run</strong>
-      </div>
-    </div>` : ''}
-
+    ${hasRuns?`<div style="margin-top:12px"><div class="sec-label">Auto-classification</div>
+      <div class="warn-banner">Runs classified by duration &amp; HR. Edit individual runs in History after import.</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">&gt;55 min → <strong style="color:#a78bfa">Long Run</strong> &nbsp;·&nbsp; HR &gt;153 → <strong style="color:#fbbf24">Threshold</strong> &nbsp;·&nbsp; else → <strong style="color:#34d399">Easy Run</strong></div>
+    </div>`:''}
     <div class="btn-row">
-      <button class="btn btn-ghost" onclick="document.getElementById('state-area').innerHTML=''">Cancel</button>
-      <button class="btn btn-primary" onclick="doImport()">Import →</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('ah-state-area').innerHTML=''">Cancel</button>
+      <button class="btn btn-primary" onclick="ahDoImport()">Import →</button>
     </div>
   </div>`;
 }
 
-// ═══════════════════════════════════════════════
-//  IMPORT
-// ═══════════════════════════════════════════════
+function ahDoImport() {
+  const importRuns = document.getElementById('ah-opt-runs')?.checked ?? false;
+  const importBody = document.getElementById('ah-opt-body')?.checked ?? false;
+  const S = loadWT(); if (!S.bodyLogs) S.bodyLogs=[];
+  let runsAdded=0, bodyDaysAdded=0;
 
-function doImport() {
-  const importRuns = document.getElementById('opt-runs')?.checked ?? false;
-  const importBody = document.getElementById('opt-body')?.checked ?? false;
-
-  const S = loadState();
-  if (!S.bodyLogs) S.bodyLogs = [];
-
-  let runsAdded = 0, bodyDaysAdded = 0;
-
-  if (importRuns && parsed.runs.length) {
-    const existingDates = new Set(S.runLogs.map(l => l.date));
-    for (const run of parsed.runs) {
-      if (existingDates.has(run.date)) continue;
-      S.runLogs.push({
-        id: uid(),
-        date: run.date,
-        type: run.type,
-        distance: run.distance,
-        duration: run.duration,
-        notes: run.avgHR ? `Avg HR: ${Math.round(run.avgHR)} bpm (imported from Apple Health)` : 'Imported from Apple Health',
-      });
-      existingDates.add(run.date);
-      runsAdded++;
+  if (importRuns) {
+    const ex=new Set(S.runLogs.map(l=>l.date));
+    for (const run of ahParsed.runs) {
+      if (ex.has(run.date)) continue;
+      S.runLogs.push({ id:uid(), date:run.date, type:run.type, distance:run.distance, duration:run.duration, notes:run.avgHR?`Avg HR: ${Math.round(run.avgHR)} bpm (Apple Health)`:'Imported from Apple Health' });
+      ex.add(run.date); runsAdded++;
     }
   }
 
   if (importBody) {
-    // Merge all body metric dates
-    const allDates = new Set([
-      ...parsed.rhr.keys(),
-      ...parsed.hrv.keys(),
-      ...parsed.weight.keys(),
-      ...parsed.bodyFat.keys(),
-    ]);
-
-    const existingMap = new Map(S.bodyLogs.map(l => [l.date, l]));
-
+    const allDates=new Set([...ahParsed.rhr.keys(),...ahParsed.hrv.keys(),...ahParsed.weight.keys(),...ahParsed.bodyFat.keys()]);
+    const exMap=new Map(S.bodyLogs.map(l=>[l.date,l]));
+    // Also merge into lifestyle logs
+    const LS = loadLS();
     for (const date of [...allDates].sort()) {
-      if (existingMap.has(date)) continue; // don't overwrite manually entered data
-      const entry = {
-        id:      uid(),
-        date,
-        weight:  parsed.weight.has(date)  ? parsed.weight.get(date)  : null,
-        bodyFat: parsed.bodyFat.has(date) ? parsed.bodyFat.get(date) : null,
-        rhr:     parsed.rhr.has(date)     ? parsed.rhr.get(date)     : null,
-        hrv:     parsed.hrv.has(date)     ? parsed.hrv.get(date)     : null,
-        notes:   'Imported from Apple Health',
-      };
-      S.bodyLogs.push(entry);
-      bodyDaysAdded++;
+      if (!exMap.has(date)) {
+        S.bodyLogs.push({ id:uid(), date, weight:ahParsed.weight.get(date)??null, bodyFat:ahParsed.bodyFat.get(date)??null, rhr:ahParsed.rhr.get(date)??null, hrv:ahParsed.hrv.get(date)??null, notes:'Apple Health' });
+        bodyDaysAdded++;
+      }
+      // Merge weight + HR into lifestyle logs (don't overwrite existing manual entries)
+      if (!LS[date]) LS[date] = {};
+      if (!LS[date].weight && ahParsed.weight.has(date)) LS[date].weight = ahParsed.weight.get(date);
+      if (!LS[date].hr    && ahParsed.rhr.has(date))    LS[date].hr    = ahParsed.rhr.get(date);
     }
+    saveLS(LS);
   }
 
-  saveState(S);
-
-  // Show results
-  document.getElementById('state-area').innerHTML = `
+  saveWT(S);
+  document.getElementById('ah-state-area').innerHTML=`
   <div class="card" style="text-align:center">
     <div class="success-icon">✅</div>
     <div class="success-title">Import complete!</div>
     <div style="max-width:380px;margin:16px auto 0;text-align:left">
-      ${runsAdded   > 0 ? `<div class="result-row"><span class="result-dot">•</span> ${runsAdded} run${runsAdded!==1?'s':''} added to Running log</div>` : ''}
-      ${bodyDaysAdded>0 ? `<div class="result-row"><span class="result-dot">•</span> ${bodyDaysAdded} days of body metrics added</div>` : ''}
-      ${runsAdded===0 && bodyDaysAdded===0 ? `<div class="result-row" style="color:var(--muted)">Nothing new to import — all data already existed.</div>` : ''}
+      ${runsAdded>0?`<div class="result-row"><span class="result-dot">•</span> ${runsAdded} run${runsAdded!==1?'s':''} added to Running log</div>`:''}
+      ${bodyDaysAdded>0?`<div class="result-row"><span class="result-dot">•</span> ${bodyDaysAdded} days of body metrics added</div>`:''}
+      ${runsAdded===0&&bodyDaysAdded===0?`<div class="result-row" style="color:var(--muted)">Nothing new — all data already existed.</div>`:''}
     </div>
     <div class="success-links">
-      <a href="index.html" class="btn btn-ghost">🏠 Today</a>
-      <a href="progress.html" class="btn btn-ghost">📈 Running Progress</a>
-      <a href="metrics.html" class="btn btn-primary">⚖️ View Metrics</a>
+      <a href="lifestyle.html" class="btn btn-primary">🌱 Lifestyle</a>
+      <a href="metrics.html" class="btn btn-ghost">⚖️ Metrics</a>
+      <a href="progress.html" class="btn btn-ghost">📈 Running</a>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  MACROFACTOR
+// ══════════════════════════════════════════════════
+
+const mfDz = document.getElementById('mf-drop-zone');
+mfDz.addEventListener('dragover',  e => { e.preventDefault(); mfDz.classList.add('dragover'); });
+mfDz.addEventListener('dragleave', () => mfDz.classList.remove('dragover'));
+mfDz.addEventListener('drop', e => { e.preventDefault(); mfDz.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) mfProcessFile(f); });
+function mfOnFileSelected(e) { const f=e.target.files[0]; if(f) mfProcessFile(f); }
+
+let mfParsed = null;
+
+function mfProcessFile(file) {
+  document.getElementById('mf-state-area').innerHTML=`
+    <div class="card"><div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-title">Parsing ${file.name}…</div>
+    </div></div>`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try { mfParsed = parseMFcsv(e.target.result); mfShowPreview(); }
+    catch(err) { document.getElementById('mf-state-area').innerHTML=`<div class="card"><div style="color:var(--red);padding:16px">Error: ${err.message}</div></div>`; }
+  };
+  reader.onerror = () => { document.getElementById('mf-state-area').innerHTML=`<div class="card"><div style="color:var(--red);padding:16px">Failed to read file.</div></div>`; };
+  reader.readAsText(file);
+}
+
+// ── CSV parser ────────────────────────────────────
+function parseCSVLine(line) {
+  const result=[], re=/("(?:[^"]|"")*"|[^,]*)(,|$)/g;
+  let m;
+  while((m=re.exec(line))!==null) {
+    let v=m[1].trim();
+    if(v.startsWith('"')&&v.endsWith('"')) v=v.slice(1,-1).replace(/""/g,'"');
+    result.push(v);
+    if(m[2]==='') break;
+  }
+  return result;
+}
+
+function normalizeCol(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+// Map of normalized col name → field
+const COL_MAP = {
+  // Date
+  'date': 'date',
+  // Weight
+  'weight': 'weight', 'bodyweight': 'weight', 'weightlbs': 'weight', 'weightkg': 'weightKg',
+  'weighttrend': 'weightTrend', 'weighttrendlbs': 'weightTrend',
+  // Calories / energy
+  'energyintake': 'calories', 'caloricintake': 'calories', 'calories': 'calories', 'kcal': 'calories', 'intake': 'calories',
+  'energyexpenditure': 'tdee', 'expenditure': 'tdee', 'tdee': 'tdee', 'maintenance': 'tdee',
+  // Macros
+  'protein': 'protein', 'proteing': 'protein',
+  'carbs': 'carbs', 'carbsg': 'carbs', 'carbohydrates': 'carbs',
+  'fat': 'fat', 'fatg': 'fat', 'totalfat': 'fat',
+};
+
+function parseMFcsv(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) throw new Error('File appears empty or has only one row.');
+
+  const headers = parseCSVLine(lines[0]);
+  const colIdx  = {}; // field → column index
+  headers.forEach((h, i) => {
+    const field = COL_MAP[normalizeCol(h)];
+    if (field && !(field in colIdx)) colIdx[field] = i;
+  });
+
+  if (!('date' in colIdx)) throw new Error('Could not find a Date column. Make sure you exported as CSV from MacroFactor.');
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCSVLine(lines[i]);
+    const raw   = {};
+    for (const [field, idx] of Object.entries(colIdx)) raw[field] = cells[idx] ?? '';
+
+    // Parse date — MacroFactor typically uses YYYY-MM-DD or M/D/YYYY
+    let date = raw.date?.trim();
+    if (!date) continue;
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(date)) {
+      const [m,d,y] = date.split('/');
+      date = `${y}-${pad(m)}-${pad(d)}`;
+    } else if (/^\d{4}-\d{2}-\d{2}/.test(date)) {
+      date = date.slice(0,10);
+    } else continue; // unrecognized format
+
+    const num = v => { const n=parseFloat(v); return isNaN(n)?null:n; };
+
+    // Handle kg→lbs if column was weightKg
+    let weight = num(raw.weight);
+    if (weight == null && raw.weightKg != null) weight = Math.round(num(raw.weightKg) * 2.20462 * 10) / 10;
+    else if (weight != null) weight = Math.round(weight * 10) / 10;
+
+    const entry = {
+      date,
+      weight,
+      weightTrend: raw.weightTrend ? Math.round(num(raw.weightTrend)*10)/10 : null,
+      calories:    num(raw.calories) != null ? Math.round(num(raw.calories)) : null,
+      tdee:        num(raw.tdee)     != null ? Math.round(num(raw.tdee))     : null,
+      protein:     num(raw.protein)  != null ? Math.round(num(raw.protein))  : null,
+      carbs:       num(raw.carbs)    != null ? Math.round(num(raw.carbs))    : null,
+      fat:         num(raw.fat)      != null ? Math.round(num(raw.fat))      : null,
+    };
+
+    if (Object.values(entry).slice(1).every(v => v == null)) continue; // skip fully empty rows
+    rows.push(entry);
+  }
+
+  if (!rows.length) throw new Error('No data rows found. Check that the file has data and is comma-separated.');
+
+  const hasWeight   = rows.some(r => r.weight   != null);
+  const hasCalories = rows.some(r => r.calories  != null);
+  const hasTDEE     = rows.some(r => r.tdee      != null);
+  const hasMacros   = rows.some(r => r.protein   != null);
+  const detected    = { hasWeight, hasCalories, hasTDEE, hasMacros };
+
+  const LS = loadLS();
+  rows.forEach(r => { r.isNewWeight = r.weight != null && !LS[r.date]?.weight; });
+
+  return { rows, detected, colIdx };
+}
+
+function mfShowPreview() {
+  const { rows, detected } = mfParsed;
+  const weightRows   = rows.filter(r => r.weight    != null);
+  const calorieRows  = rows.filter(r => r.calories  != null);
+  const newWeightCt  = rows.filter(r => r.isNewWeight).length;
+  const skipWeightCt = weightRows.length - newWeightCt;
+
+  function fi(icon, count, label, skipCount=0) {
+    return `<div class="found-item${count===0?' found-none':''}">
+      <div class="found-icon">${icon}</div>
+      <div><div class="found-count">${count.toLocaleString()}</div><div class="found-label">${label}</div>
+      ${skipCount>0?`<div class="found-skip">${skipCount} already logged → skip</div>`:''}</div></div>`;
+  }
+
+  // Preview last 5 rows (most recent)
+  const preview = [...rows].reverse().slice(0, 5);
+  const previewHtml = `
+    <div class="mf-preview">
+      <div class="mf-preview-row hdr-row">
+        <div class="mf-cell head">Date</div>
+        ${detected.hasWeight   ? '<div class="mf-cell head">Weight</div>' : ''}
+        ${detected.hasCalories ? '<div class="mf-cell head">Calories</div>' : ''}
+        ${detected.hasTDEE     ? '<div class="mf-cell head">TDEE</div>' : ''}
+        ${detected.hasMacros   ? '<div class="mf-cell head">P/C/F</div>' : ''}
+      </div>
+      ${preview.map(r => `
+        <div class="mf-preview-row">
+          <div class="mf-cell date">${r.date}</div>
+          ${detected.hasWeight   ? `<div class="mf-cell val">${r.weight ?? '—'}</div>` : ''}
+          ${detected.hasCalories ? `<div class="mf-cell val">${r.calories ?? '—'}</div>` : ''}
+          ${detected.hasTDEE     ? `<div class="mf-cell val">${r.tdee ?? '—'}</div>` : ''}
+          ${detected.hasMacros   ? `<div class="mf-cell val">${r.protein != null ? `${r.protein}/${r.carbs}/${r.fat}` : '—'}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
+
+  document.getElementById('mf-state-area').innerHTML=`
+  <div class="card">
+    <div class="sec-label">Found in export</div>
+    <div class="found-grid">
+      ${fi('⚖️', weightRows.length, 'Weight entries', skipWeightCt)}
+      ${fi('🔥', calorieRows.length, 'Days of nutrition data')}
+    </div>
+
+    <div class="sec-label">Preview (most recent)</div>
+    ${previewHtml}
+
+    <div class="sec-label">What gets imported</div>
+    <div>
+      ${detected.hasWeight?`<div class="opt-row"><input type="checkbox" class="opt-check" id="mf-opt-weight" checked><label class="opt-label" for="mf-opt-weight">Weight → Lifestyle tracker weight log</label><span class="opt-count">${newWeightCt} new${skipWeightCt?`, ${skipWeightCt} skipped`:''}</span></div>`:''}
+      ${detected.hasCalories||detected.hasTDEE||detected.hasMacros?`<div class="opt-row"><input type="checkbox" class="opt-check" id="mf-opt-nutrition" checked><label class="opt-label" for="mf-opt-nutrition">Nutrition (calories, TDEE, macros) → stored as daily notes</label><span class="opt-count">${calorieRows.length} days</span></div>`:''}
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="document.getElementById('mf-state-area').innerHTML=''">Cancel</button>
+      <button class="btn btn-primary" onclick="mfDoImport()">Import →</button>
+    </div>
+  </div>`;
+}
+
+function mfDoImport() {
+  const importWeight    = document.getElementById('mf-opt-weight')?.checked    ?? false;
+  const importNutrition = document.getElementById('mf-opt-nutrition')?.checked ?? false;
+
+  const LS = loadLS();
+  let weightAdded=0, nutritionAdded=0;
+
+  for (const row of mfParsed.rows) {
+    if (!LS[row.date]) LS[row.date] = {};
+    const entry = LS[row.date];
+
+    if (importWeight && row.weight != null && !entry.weight) {
+      entry.weight = row.weight;
+      weightAdded++;
+    }
+
+    if (importNutrition && (row.calories != null || row.tdee != null || row.protein != null)) {
+      // Build a nutrition note, append to existing notes if any
+      const parts = [];
+      if (row.calories != null) parts.push(`${row.calories} kcal`);
+      if (row.tdee     != null) parts.push(`TDEE ${row.tdee}`);
+      if (row.protein  != null) parts.push(`P${row.protein}/C${row.carbs}/F${row.fat}g`);
+      const note = `[MF] ${parts.join(' · ')}`;
+      if (!entry.notes?.includes('[MF]')) {
+        entry.notes = entry.notes ? entry.notes + '\n' + note : note;
+        nutritionAdded++;
+      }
+    }
+  }
+
+  saveLS(LS);
+
+  document.getElementById('mf-state-area').innerHTML=`
+  <div class="card" style="text-align:center">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Import complete!</div>
+    <div style="max-width:380px;margin:16px auto 0;text-align:left">
+      ${weightAdded>0    ? `<div class="result-row"><span class="result-dot">•</span> ${weightAdded} weight entries added to Lifestyle tracker</div>` : ''}
+      ${nutritionAdded>0 ? `<div class="result-row"><span class="result-dot">•</span> ${nutritionAdded} days of nutrition data stored as daily notes</div>` : ''}
+      ${weightAdded===0&&nutritionAdded===0 ? `<div class="result-row" style="color:var(--muted)">Nothing new — all data already existed.</div>` : ''}
+    </div>
+    <div class="success-links">
+      <a href="lifestyle.html" class="btn btn-primary">🌱 Lifestyle</a>
+      <a href="metrics.html" class="btn btn-ghost">⚖️ Metrics</div>
     </div>
   </div>`;
 }
